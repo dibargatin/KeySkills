@@ -3,6 +3,16 @@ using Xunit;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using KeySkills.Crawler.Core.Models;
+using System.Net.Http;
+using Moq;
+using Moq.Protected;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Net;
+using System.Reactive.Linq;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Threading.Tasks;
 
 namespace KeySkills.Crawler.Core.Tests
 {
@@ -87,6 +97,104 @@ namespace KeySkills.Crawler.Core.Tests
                     GetJobPost(title, _correctPublishedDateString).GetVacancy().CountryCode
                         .Should().BeNull($"because {title} doesn't contain region info");
             }
+        }
+
+        public class GetVacancies_Should
+        {
+            private Uri _baseUri = new Uri("https://stackoverflow.com");
+            
+            private StackoverflowJobBoardClient GetStackoverflowJobBoardClient(HttpMessageHandler handler) =>
+                new StackoverflowJobBoardClient(
+                    new HttpClient(handler) {
+                        BaseAddress = _baseUri
+                    });
+
+            private Mock<HttpMessageHandler> GetHttpMessageHandlerMock(HttpResponseMessage expectedResponse)
+            {
+                var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+                httpMessageHandlerMock.Protected()
+                    .Setup<Task<HttpResponseMessage>>(
+                        "SendAsync",
+                        ItExpr.IsAny<HttpRequestMessage>(),
+                        ItExpr.IsAny<CancellationToken>()
+                    ).ReturnsAsync(expectedResponse)
+                    .Verifiable();
+
+                return httpMessageHandlerMock;
+            }
+            
+            [Fact]
+            public void MakeSingleHttpGetRequest()
+            {
+                var httpMessageHandler = GetHttpMessageHandlerMock(
+                    expectedResponse: new HttpResponseMessage() { 
+                        StatusCode = HttpStatusCode.OK
+                    });
+                
+                GetStackoverflowJobBoardClient(httpMessageHandler.Object)
+                    .GetVacancies().ToList();
+                
+                httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1), // Only single GET request is expected
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == new Uri(_baseUri, "/jobs/feed")
+                    ),
+                    ItExpr.IsAny<CancellationToken>()
+                );
+            }
+
+            private static Vacancy[] _vacancies = new[] {
+                new Vacancy {
+                    Link = "abc",
+                    Title = "xyz (Moscow, Russia)",
+                    Description = "qwerty",
+                    PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
+                    CountryCode = Country.RU
+                },
+                new Vacancy {
+                    Link = "zzz",
+                    Title = "yyy (Paris, France)",
+                    Description = "qwerty",
+                    PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
+                    CountryCode = Country.FR
+                }
+            };
+
+            private static IEnumerable<T> Single<T>(T item) => new[] { item };
+
+            private static string VacancyToXml(Vacancy vacancy) => 
+                $@"<item>
+                    <link>{vacancy.Link}</link>
+                    <title>{vacancy.Title}</title>
+                    <description>{vacancy.Description}</description>
+                    <pubDate>{vacancy.PublishedAt.ToString("O")}</pubDate>
+                </item>";
+
+            private static string VacanciesToXml(IEnumerable<Vacancy> vacancies) =>
+                $@"<rss><channel>{
+                    String.Join(String.Empty, vacancies.Select(v => VacancyToXml(v)))
+                }</channel></rss>";
+
+            public static TheoryData<string, IEnumerable<Vacancy>> CorrectlyDeserializeResponseData =>
+                new TheoryData<string, IEnumerable<Vacancy>> {
+                    { VacanciesToXml(Single(_vacancies[0])), Single(_vacancies[0]) },
+                    { VacanciesToXml(_vacancies), _vacancies }
+                };
+
+            [Theory]
+            [MemberData(nameof(CorrectlyDeserializeResponseData))]
+            public async void CorrectlyDeserializeResponse(string responseContent, IEnumerable<Vacancy> expected) =>            
+                (await GetStackoverflowJobBoardClient(
+                    GetHttpMessageHandlerMock(
+                        expectedResponse: new HttpResponseMessage() { 
+                            StatusCode = HttpStatusCode.OK,
+                            Content = new StringContent(responseContent)
+                        }).Object
+                    ).GetVacancies().ToList().ToTask()
+                ).Should().BeEquivalentTo(expected);
         }
     }
 }
