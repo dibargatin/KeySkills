@@ -8,6 +8,13 @@ namespace KeySkills.Crawler.Core.Tests
 {
     public class CountryHelperFacts
     {
+        public static TheoryData<string> LoremIpsum =>
+            new TheoryData<string> {
+                { null },
+                { String.Empty },
+                { "Lorem ipsum" }
+            };
+            
         public class GetCountryName_Should
         {
             [Fact]
@@ -16,15 +23,8 @@ namespace KeySkills.Crawler.Core.Tests
                     .Should().Be("Netherlands");
         }
 
-        public class TryGetCountryByName_Should
-        {
-            public static TheoryData<string> LoremIpsum =>
-                new TheoryData<string> {
-                    { null },
-                    { String.Empty },
-                    { "Lorem ipsum" }
-                };
-                
+        public class TryGetCountryByName_Should : CountryHelperFacts
+        {                
             [Theory]
             [MemberData(nameof(LoremIpsum))]
             public void ReturnNullForUnknownName(string name) =>
@@ -37,6 +37,22 @@ namespace KeySkills.Crawler.Core.Tests
             public void ReturnCountryForKnownName(string name, Country expected) =>
                 CountryHelper.TryGetCountryByName(name)
                     .Should().Be(expected, $"because {name} is the name for {expected}");
+        }
+        
+        public class IsUsaState_Should : CountryHelperFacts
+        {
+            [Theory]
+            [InlineData("FL")]
+            [InlineData("CA")]
+            public void ReturnTrueForUsaStateCode(string code) =>
+                CountryHelper.IsUsaState(code)
+                    .Should().BeTrue();
+
+            [Theory]
+            [MemberData(nameof(LoremIpsum))]
+            public void ReturnFalseForAnythingElse(string anythingElse) =>
+                CountryHelper.IsUsaState(anythingElse)
+                    .Should().BeFalse();
         }
     }
 }

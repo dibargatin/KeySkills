@@ -65,7 +65,7 @@ namespace KeySkills.Crawler.Core
                 GetRegionName() switch {
                     null => null,
                     "UK" => Country.GB,
-                    var name when name.Length == 2 => Country.US,
+                    var name when CountryHelper.IsUsaState(name) => Country.US,
                     var name => CountryHelper.TryGetCountryByName(name).GetValueOrDefault(),
                 };
             
