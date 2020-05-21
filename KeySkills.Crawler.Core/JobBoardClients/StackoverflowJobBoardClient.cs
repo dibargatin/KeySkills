@@ -47,6 +47,9 @@ namespace KeySkills.Crawler.Core
             [XmlElement("pubDate")]
             public string PublishedDateString { get; set; }
 
+            [XmlElement("location", Namespace="http://stackoverflow.com/jobs/")]
+            public string Location { get; set; }
+
             public Vacancy GetVacancy() => 
                 new Vacancy {
                     Link = Link,
@@ -67,7 +70,7 @@ namespace KeySkills.Crawler.Core
                 };
             
             private string GetRegionName() =>                
-                Regex.Match(Title ?? String.Empty, @"\([\w\s]+,\s(?<region>[\w\s]+)\)") switch {
+                Regex.Match(Location ?? String.Empty, @"[\w\s]+,\s(?<region>[\w\s]+)") switch {
                     var match when match.Success => match.Groups["region"].Value,
                     _ => null
                 };                    

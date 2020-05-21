@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
+using KeySkills.Crawler.Core.Helpers;
 
 namespace KeySkills.Crawler.Core.Tests
 {
@@ -24,9 +25,9 @@ namespace KeySkills.Crawler.Core.Tests
             {                
                 private static readonly string _correctPublishedDateString = "Sun, 1 Mar 2020 00:00:00 Z";
 
-                private StackoverflowJobBoardClient.JobPost GetJobPost(string title, string publishedDateString) =>
+                private StackoverflowJobBoardClient.JobPost GetJobPost(string location, string publishedDateString) =>
                     new StackoverflowJobBoardClient.JobPost { 
-                        Title = title,
+                        Location = location,
                         PublishedDateString = publishedDateString 
                     };
 
@@ -48,8 +49,10 @@ namespace KeySkills.Crawler.Core.Tests
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
                 public void ReturnTitle(string title) =>
-                    GetJobPost(title, _correctPublishedDateString).GetVacancy()
-                        .Title.Should().Be(title);
+                    new StackoverflowJobBoardClient.JobPost { 
+                        Title = title,
+                        PublishedDateString = _correctPublishedDateString
+                    }.GetVacancy().Title.Should().Be(title);
 
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
@@ -81,21 +84,21 @@ namespace KeySkills.Crawler.Core.Tests
                         .Should().Throw<FormatException>($"because {publishedDateString} isn't a valid date");
 
                 [Theory]
-                [InlineData("PostgreSQL DBA at Starling Bank (London, UK)", Country.GB)]
-                [InlineData("Machine Learning Engineer at JP Morgan Chase (Jersey City, NJ)", Country.US)]
-                [InlineData("Softwareentwickler Java (m/w/d) (Dresden, Deutschland)", Country.DE)]
-                [InlineData("Senior Software Engineer- Media Platform at Joyn (München, Germany)", Country.DE)]
-                [InlineData("Software Engineer Full Stack Java (Ecublens VD, Schweiz)(allows remote)", Country.CH)]
-                [InlineData("Senior Software Developer/Software Developer (Mariehamn, Åland Islands)", Country.AX)]
-                public void ExtractCountryFromTitleWithRegionInfo(string title, Country expected) =>
-                    GetJobPost(title, _correctPublishedDateString).GetVacancy().CountryCode
-                        .Should().Be(expected, $"because of {title}");
+                [InlineData("London, UK", Country.GB)]
+                [InlineData("Jersey City, NJ", Country.US)]
+                [InlineData("Dresden, Deutschland", Country.DE)]
+                [InlineData("München, Germany", Country.DE)]
+                [InlineData("Ecublens VD, Schweiz", Country.CH)]
+                [InlineData("Mariehamn, Åland Islands", Country.AX)]
+                public void ExtractCountryFromLocation(string location, Country expected) =>
+                    GetJobPost(location, _correctPublishedDateString).GetVacancy().CountryCode
+                        .Should().Be(expected, $"because of {location}");
                 
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
-                public void ReturnNullForCountryWhenTitleWithoutRegionInfo(string title) => 
-                    GetJobPost(title, _correctPublishedDateString).GetVacancy().CountryCode
-                        .Should().BeNull($"because {title} doesn't contain region info");
+                public void ReturnNullForCountryWhenLocationIsEmpty(string location) => 
+                    GetJobPost(location, _correctPublishedDateString).GetVacancy().CountryCode
+                        .Should().BeNull($"because {location} doesn't contain region info");
             }
         }
 
@@ -149,15 +152,14 @@ namespace KeySkills.Crawler.Core.Tests
             private static Vacancy[] _vacancies = new[] {
                 new Vacancy {
                     Link = "abc",
-                    Title = "xyz (Moscow, Russia)",
+                    Title = "xyz",
                     Description = "qwerty",
-                    PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
-                    CountryCode = Country.RU
+                    PublishedAt = 1.March(2020).At(12, 0).AsUtc()
                 },
                 new Vacancy {
                     Link = "zzz",
-                    Title = "yyy (Paris, France)",
-                    Description = "qwerty",
+                    Title = "yyy",
+                    Description = "asdfg",
                     PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
                     CountryCode = Country.FR
                 }
@@ -171,6 +173,13 @@ namespace KeySkills.Crawler.Core.Tests
                     <title>{vacancy.Title}</title>
                     <description>{vacancy.Description}</description>
                     <pubDate>{vacancy.PublishedAt.ToString("O")}</pubDate>
+                    {(
+                        vacancy.CountryCode.HasValue ?
+                            $@"<location xmlns='http://stackoverflow.com/jobs/'>City, {
+                                CountryHelper.GetCountryName(vacancy.CountryCode.Value)
+                            }</location>" :
+                            String.Empty
+                    )}
                 </item>";
 
             private static string VacanciesToXml(IEnumerable<Vacancy> vacancies) =>

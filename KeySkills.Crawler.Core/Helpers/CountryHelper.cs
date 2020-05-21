@@ -8,18 +8,20 @@ namespace KeySkills.Crawler.Core.Helpers
 {
     public static class CountryHelper
     {
+        public static string GetCountryName(Country code) =>
+            (new RegionInfo(code.ToString())).EnglishName;
+
         public static Country? TryGetCountryByName(string regionName)
         {
-            Country countryCode;
-
-            if(regionName != null && _countryCodeByName.Value.TryGetValue(regionName, out countryCode))
-            {            
-                return countryCode;
-            }
-            else
+            if(regionName != null)
             {
-                return null;
+                Country countryCode;
+                
+                return _countryCodeByName.Value.TryGetValue(regionName, out countryCode) ? 
+                    countryCode :
+                    (Country?) null;
             }
+            else return null;
         }
 
         private static readonly Lazy<ReadOnlyDictionary<string, Country>> _countryCodeByName = 
