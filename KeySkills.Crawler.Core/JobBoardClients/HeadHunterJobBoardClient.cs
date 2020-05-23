@@ -1,75 +1,67 @@
 using System;
 using System.Net.Http;
-using System.Text.Json.Serialization;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Core.Models;
+using static KeySkills.Crawler.Core.HeadHunterJobBoardClient.Response;
 
 namespace KeySkills.Crawler.Core
 {
     public partial class HeadHunterJobBoardClient : BaseJobBoardClient
     {
         private readonly IRequestFactory _requestFactory;
+        private readonly Func<string, bool> _isVacancyExisted;
 
-        public HeadHunterJobBoardClient(HttpClient http, IRequestFactory requestFactory) : base(http) =>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HeadHunterJobBoardClient"/> class
+        /// </summary>
+        /// <param name="http">Instance of HttpClient to make API requests</param>
+        /// <param name="requestFactory">Instance of IRequestFactory to get required requests</param>
+        /// <param name="isVacancyExisted">Predicate for filtering already downloaded vacancies by URL</param>
+        /// <exception cref="ArgumentNullException"><paramref name="http"/> is <see langword="null" /></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="requestFactory"/> is <see langword="null" /></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="isVacancyExisted"/> is <see langword="null" /></exception>
+        public HeadHunterJobBoardClient(
+            HttpClient http, 
+            IRequestFactory requestFactory, 
+            Func<string, bool> isVacancyExisted
+            ) : base(http)
+        {
             _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
-        
-        public override IObservable<Vacancy> GetVacancies()
-        {
-            throw new NotImplementedException();
+            _isVacancyExisted = isVacancyExisted ?? throw new ArgumentNullException(nameof(isVacancyExisted));
         }
         
-        #region HeadHunter WebAPI Response
+        public override IObservable<Vacancy> GetVacancies() =>
+            GetItems()
+                .Where(item => !_isVacancyExisted(item.AlternateUrl))
+                .SelectMany(item => Observable.FromAsync(async () => await GetJobDetails(item.Url)))
+                .SelectMany(job => Observable.FromAsync(async () => await job.GetVacancy(GetAreaInfo)));                
 
-        public class Root
-        {
-            [JsonPropertyName("items")]
-            public Item[] Items { get; set; }
-            
-            [JsonPropertyName("pages")]
-            public int PagesCount { get; set; }
-            
-            [JsonPropertyName("page")]
-            public int CurrentPage { get; set; }            
-        }
+        private Task<Root> GetNextRoot(int page) =>
+            ExecuteRequest<Root>(
+                _requestFactory.CreateRootRequest(page),
+                Deserializer.Json.Default
+            );
+        
+        private IObservable<Item> GetItems() => 
+            ObservableHelper.Generate(
+                async () => await GetNextRoot(1),
+                prev => prev.CurrentPage < prev.PagesCount,
+                async prev => await GetNextRoot(prev.CurrentPage + 1),
+                result => result
+            ).SelectMany(root => root.Items);
 
-        public class Item
-        {
-            [JsonPropertyName("url")]
-            public string Url { get; set; }
-        }
+        private Task<JobPost> GetJobDetails(string url) =>
+            ExecuteRequest<JobPost>(
+                _requestFactory.CreateJobDetailsRequest(url),
+                Deserializer.Json.Default
+            );
 
-        public class JobPost
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-
-            [JsonPropertyName("area")]
-            public Area Area { get; set; }
-
-            [JsonPropertyName("description")]
-            public string Description { get; set; }
-
-            [JsonPropertyName("published_at")]
-            public DateTime PublishedAt { get; set; }
-        }
-
-        public class Area
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
-        }
-
-        public class AreaInfo
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
-
-            [JsonPropertyName("parent_id")]
-            public string ParentId { get; set; }
-
-            [JsonPropertyName("name")]
-            public string Name { get; set; }            
-        }
-
-        #endregion
+        private Task<AreaInfo> GetAreaInfo(string id) =>
+            ExecuteRequest<AreaInfo>(
+                _requestFactory.CreateAreaRequest(id), 
+                Deserializer.Json.Default
+            );
     }
 }
