@@ -17,12 +17,20 @@ namespace KeySkills.Crawler.Core.Helpers
             return Observable.Create<TResult>(async observable => 
                 (scheduler ?? Scheduler.Default).Schedule(
                     await initialState(), 
-                    async (state, self) => {
-                        if (!condition(state)) {
-                            observable.OnNext(resultSelector(state));
-                            self(await iterate(state));
+                    async (state, self) => {                        
+                        try 
+                        { 
+                            if (condition(state)) 
+                            {
+                                observable.OnNext(resultSelector(state));
+                                self(await iterate(state));
+                            }
+                            else observable.OnCompleted();
                         }
-                        else observable.OnCompleted();
+                        catch (Exception ex)
+                        {
+                            observable.OnError(ex);
+                        }
                     }));
         }
     }
