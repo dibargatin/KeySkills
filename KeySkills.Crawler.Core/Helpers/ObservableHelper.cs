@@ -7,11 +7,11 @@ namespace KeySkills.Crawler.Core.Helpers
 {
     public class ObservableHelper
     {
-        public static IObservable<TResult> Generate<TResult>(
-            Func<Task<TResult>> initialState,
-            Func<TResult, bool> condition,
-            Func<TResult, Task<TResult>> iterate,
-            Func<TResult, TResult> resultSelector,
+        public static IObservable<TResult> Generate<TState, TResult>(
+            Func<Task<TState>> initialState,
+            Func<TState, bool> condition,
+            Func<TState, Task<TState>> iterate,
+            Func<TState, TResult> resultSelector,
             IScheduler scheduler = null)
         {
             return Observable.Create<TResult>(async observable => 
@@ -20,11 +20,9 @@ namespace KeySkills.Crawler.Core.Helpers
                     async (state, self) => {                        
                         try 
                         { 
-                            if (condition(state)) 
-                            {
-                                observable.OnNext(resultSelector(state));
-                                self(await iterate(state));
-                            }
+                            observable.OnNext(resultSelector(state));
+
+                            if (condition(state)) self(await iterate(state));
                             else observable.OnCompleted();
                         }
                         catch (Exception ex)

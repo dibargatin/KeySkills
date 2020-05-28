@@ -20,8 +20,18 @@ namespace KeySkills.Crawler.Core.Tests
                         prev => Task.Run(() => prev + 1),
                         result => result
                     ).ToArray().ToTask()
-                ).Should().BeEquivalentTo(new[] {0,1,2});
+                ).Should().BeEquivalentTo(new[] {0,1,2,3});
             
+            [Fact]
+            public async void ReturnInitialStateWithoutCondition() =>
+                (await ObservableHelper.Generate(
+                        () => Task.Run(() => 0),
+                        prev => prev < 0,
+                        prev => Task.Run(() => prev / 0), // this shouldn't be invoked
+                        result => result
+                    ).ToArray().ToTask()
+                ).Should().BeEquivalentTo(new[] {0});
+
             public static TheoryData<IObservable<int>> ThrowData =>
                 new TheoryData<IObservable<int>> {
                     {
