@@ -40,6 +40,12 @@ namespace KeySkills.Crawler.Core
             public class JobPost
             {
                 /// <summary>
+                /// Job post id
+                /// </summary>
+                [JsonPropertyName("id")]
+                public string Id { get; set; }
+
+                /// <summary>
                 /// Job post title
                 /// </summary>
                 [JsonPropertyName("name")]

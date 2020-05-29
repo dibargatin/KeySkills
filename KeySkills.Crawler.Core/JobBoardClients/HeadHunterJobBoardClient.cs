@@ -45,10 +45,10 @@ namespace KeySkills.Crawler.Core
             );
         
         private IObservable<Item> GetItems() => 
-            ObservableHelper.Generate(
-                async () => await GetNextRoot(1),
+            ObservableHelper.GenerateFromAsync(
+                () => GetNextRoot(1),
                 prev => prev.CurrentPage < prev.PagesCount,
-                async prev => await GetNextRoot(prev.CurrentPage + 1),
+                prev => GetNextRoot(prev.CurrentPage + 1),
                 result => result
             ).SelectMany(root => root.Items);
 

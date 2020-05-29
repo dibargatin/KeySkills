@@ -9,10 +9,10 @@ namespace KeySkills.Crawler.Core.Tests
 {
     public partial class HeadHunterJobBoardClientFacts
     {
-        public class RequestFactoryFacts
-        {
-            protected static Uri _baseUri = new Uri("https://api.hh.ru");
+        protected static Uri _baseUri = new Uri("https://api.hh.ru");
 
+        public class RequestFactoryFacts : HeadHunterJobBoardClientFacts
+        {
             public class CreateRootRequest_Should : RequestFactoryFacts
             {                
                 public static TheoryData<RequestFactory, int, Uri> ReturnRequestToExpectedUriData =>

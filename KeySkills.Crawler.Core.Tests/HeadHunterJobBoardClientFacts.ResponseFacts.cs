@@ -10,29 +10,29 @@ namespace KeySkills.Crawler.Core.Tests
 {
     public partial class HeadHunterJobBoardClientFacts
     {
-        public class ResponseFacts
-        {
-            protected static AreaInfo[] _areaInfo = new[] {
-                new AreaInfo {
-                    Id = "0",
-                    Name = "Россия"
-                },
-                new AreaInfo {
-                    Id = "1",
-                    ParentId = "0",
-                    Name = "Самарская область"
-                },
-                new AreaInfo {
-                    Id = "2",
-                    ParentId = "1",
-                    Name = "Самара"
-                },
-                new AreaInfo {
-                    Id = "3",
-                    Name = "Unknown"
-                }
-            };
+        protected static AreaInfo[] _areaInfo = new[] {
+            new AreaInfo {
+                Id = "0",
+                Name = "Россия"
+            },
+            new AreaInfo {
+                Id = "1",
+                ParentId = "0",
+                Name = "Самарская область"
+            },
+            new AreaInfo {
+                Id = "2",
+                ParentId = "1",
+                Name = "Самара"
+            },
+            new AreaInfo {
+                Id = "3",
+                Name = "Unknown"
+            }
+        };
 
+        public class ResponseFacts : HeadHunterJobBoardClientFacts
+        {
             protected static Func<string, Task<AreaInfo>> _getAreaInfoFunc = 
                 (areaId) => Task.Run(() => _areaInfo[Convert.ToInt32(areaId)]);
 
