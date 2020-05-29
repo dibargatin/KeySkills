@@ -8,8 +8,9 @@ using System.Globalization;
 using System.Linq;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Core.Models;
+using KeySkills.Crawler.Core;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Clients.Stackoverflow
 {
     public class StackoverflowClient : BaseJobBoardClient
     {

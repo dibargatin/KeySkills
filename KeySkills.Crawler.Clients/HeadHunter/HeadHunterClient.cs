@@ -2,11 +2,12 @@ using System;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using KeySkills.Crawler.Core;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Core.Models;
-using static KeySkills.Crawler.Core.HeadHunterClient.Response;
+using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient.Response;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Clients.HeadHunter
 {
     public partial class HeadHunterClient : BaseJobBoardClient
     {

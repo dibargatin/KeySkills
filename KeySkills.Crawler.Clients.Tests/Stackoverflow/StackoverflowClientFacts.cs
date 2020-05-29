@@ -14,8 +14,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using KeySkills.Crawler.Core.Helpers;
+using KeySkills.Crawler.Clients.Stackoverflow;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Crawler.Clients.Tests
 {
     public class StackoverflowClientFacts
     {

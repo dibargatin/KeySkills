@@ -4,9 +4,9 @@ using FluentAssertions;
 using FluentAssertions.Extensions;
 using KeySkills.Crawler.Core.Models;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterClient.Response;
+using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient.Response;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Crawler.Clients.Tests
 {
     public partial class HeadHunterClientFacts
     {

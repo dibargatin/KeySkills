@@ -2,10 +2,10 @@ using System;
 using System.Net.Http;
 using FluentAssertions;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterClient;
-using static KeySkills.Crawler.Core.HeadHunterClient.RequestFactory;
+using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient;
+using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient.RequestFactory;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Crawler.Clients.Tests
 {
     public partial class HeadHunterClientFacts
     {

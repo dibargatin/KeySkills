@@ -9,13 +9,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using KeySkills.Crawler.Clients.HeadHunter;
 using KeySkills.Crawler.Core.Models;
 using Moq;
 using Moq.Protected;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterClient;
+using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Crawler.Clients.Tests
 {
     public partial class HeadHunterClientFacts
     {

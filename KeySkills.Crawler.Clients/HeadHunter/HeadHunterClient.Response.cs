@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Core.Models;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Clients.HeadHunter
 {
     public partial class HeadHunterClient
     {

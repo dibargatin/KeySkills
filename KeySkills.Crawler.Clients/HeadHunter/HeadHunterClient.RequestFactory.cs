@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Clients.HeadHunter
 {
     public partial class HeadHunterClient
     {
