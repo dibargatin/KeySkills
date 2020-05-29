@@ -2,16 +2,16 @@ using System;
 using System.Net.Http;
 using FluentAssertions;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterJobBoardClient;
-using static KeySkills.Crawler.Core.HeadHunterJobBoardClient.RequestFactory;
+using static KeySkills.Crawler.Core.HeadHunterClient;
+using static KeySkills.Crawler.Core.HeadHunterClient.RequestFactory;
 
 namespace KeySkills.Crawler.Core.Tests
 {
-    public partial class HeadHunterJobBoardClientFacts
+    public partial class HeadHunterClientFacts
     {
         protected static Uri _baseUri = new Uri("https://api.hh.ru");
 
-        public class RequestFactoryFacts : HeadHunterJobBoardClientFacts
+        public class RequestFactoryFacts : HeadHunterClientFacts
         {
             public class CreateRootRequest_Should : RequestFactoryFacts
             {                

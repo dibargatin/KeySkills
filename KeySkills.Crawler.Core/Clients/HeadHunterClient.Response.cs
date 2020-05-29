@@ -6,7 +6,7 @@ using KeySkills.Crawler.Core.Models;
 
 namespace KeySkills.Crawler.Core
 {
-    public partial class HeadHunterJobBoardClient
+    public partial class HeadHunterClient
     {
         public class Response
         {

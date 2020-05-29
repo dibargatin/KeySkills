@@ -4,17 +4,17 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Core.Models;
-using static KeySkills.Crawler.Core.HeadHunterJobBoardClient.Response;
+using static KeySkills.Crawler.Core.HeadHunterClient.Response;
 
 namespace KeySkills.Crawler.Core
 {
-    public partial class HeadHunterJobBoardClient : BaseJobBoardClient
+    public partial class HeadHunterClient : BaseJobBoardClient
     {
         private readonly IRequestFactory _requestFactory;
         private readonly Func<string, bool> _isVacancyExisted;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HeadHunterJobBoardClient"/> class
+        /// Initializes a new instance of the <see cref="HeadHunterClient"/> class
         /// </summary>
         /// <param name="http">Instance of HttpClient to make API requests</param>
         /// <param name="requestFactory">Instance of IRequestFactory to get required requests</param>
@@ -22,7 +22,7 @@ namespace KeySkills.Crawler.Core
         /// <exception cref="ArgumentNullException"><paramref name="http"/> is <see langword="null" /></exception>
         /// <exception cref="ArgumentNullException"><paramref name="requestFactory"/> is <see langword="null" /></exception>
         /// <exception cref="ArgumentNullException"><paramref name="isVacancyExisted"/> is <see langword="null" /></exception>
-        public HeadHunterJobBoardClient(
+        public HeadHunterClient(
             HttpClient http, 
             IRequestFactory requestFactory, 
             Func<string, bool> isVacancyExisted

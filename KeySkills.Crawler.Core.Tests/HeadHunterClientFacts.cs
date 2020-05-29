@@ -13,11 +13,11 @@ using KeySkills.Crawler.Core.Models;
 using Moq;
 using Moq.Protected;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterJobBoardClient;
+using static KeySkills.Crawler.Core.HeadHunterClient;
 
 namespace KeySkills.Crawler.Core.Tests
 {
-    public partial class HeadHunterJobBoardClientFacts
+    public partial class HeadHunterClientFacts
     {
         public class GetVacancies_Should
         {
@@ -224,8 +224,8 @@ namespace KeySkills.Crawler.Core.Tests
                     }
                 };
             
-            private HeadHunterJobBoardClient GetHeadHunterClient(HttpMessageHandler handler, bool isVacancyExisted = false) =>
-                new HeadHunterJobBoardClient(
+            private HeadHunterClient GetHeadHunterClient(HttpMessageHandler handler, bool isVacancyExisted = false) =>
+                new HeadHunterClient(
                     new HttpClient(handler),
                     _requestFactory,
                     _ => isVacancyExisted

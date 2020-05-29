@@ -11,9 +11,9 @@ using KeySkills.Crawler.Core.Models;
 
 namespace KeySkills.Crawler.Core
 {
-    public class StackoverflowJobBoardClient : BaseJobBoardClient
+    public class StackoverflowClient : BaseJobBoardClient
     {
-        public StackoverflowJobBoardClient(HttpClient http) : base(http) {}
+        public StackoverflowClient(HttpClient http) : base(http) {}
 
         public override IObservable<Vacancy> GetVacancies() =>
             ExecuteRequest<JobPostCollection>(

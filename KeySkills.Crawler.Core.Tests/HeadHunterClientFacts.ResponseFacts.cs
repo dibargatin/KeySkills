@@ -4,11 +4,11 @@ using FluentAssertions;
 using FluentAssertions.Extensions;
 using KeySkills.Crawler.Core.Models;
 using Xunit;
-using static KeySkills.Crawler.Core.HeadHunterJobBoardClient.Response;
+using static KeySkills.Crawler.Core.HeadHunterClient.Response;
 
 namespace KeySkills.Crawler.Core.Tests
 {
-    public partial class HeadHunterJobBoardClientFacts
+    public partial class HeadHunterClientFacts
     {
         protected static AreaInfo[] _areaInfo = new[] {
             new AreaInfo {
@@ -31,7 +31,7 @@ namespace KeySkills.Crawler.Core.Tests
             }
         };
 
-        public class ResponseFacts : HeadHunterJobBoardClientFacts
+        public class ResponseFacts : HeadHunterClientFacts
         {
             protected static Func<string, Task<AreaInfo>> _getAreaInfoFunc = 
                 (areaId) => Task.Run(() => _areaInfo[Convert.ToInt32(areaId)]);

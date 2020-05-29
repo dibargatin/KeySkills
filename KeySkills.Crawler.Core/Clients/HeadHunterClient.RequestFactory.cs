@@ -4,7 +4,7 @@ using System.Text;
 
 namespace KeySkills.Crawler.Core
 {
-    public partial class HeadHunterJobBoardClient
+    public partial class HeadHunterClient
     {
         public interface IRequestFactory
         {

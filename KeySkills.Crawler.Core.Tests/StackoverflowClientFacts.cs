@@ -17,7 +17,7 @@ using KeySkills.Crawler.Core.Helpers;
 
 namespace KeySkills.Crawler.Core.Tests
 {
-    public class StackoverflowJobBoardClientFacts
+    public class StackoverflowClientFacts
     {
         public class JobPostFacts
         {
@@ -25,8 +25,8 @@ namespace KeySkills.Crawler.Core.Tests
             {                
                 private static readonly string _correctPublishedDateString = "Sun, 1 Mar 2020 00:00:00 Z";
 
-                private StackoverflowJobBoardClient.JobPost GetJobPost(string location, string publishedDateString) =>
-                    new StackoverflowJobBoardClient.JobPost { 
+                private StackoverflowClient.JobPost GetJobPost(string location, string publishedDateString) =>
+                    new StackoverflowClient.JobPost { 
                         Location = location,
                         PublishedDateString = publishedDateString 
                     };
@@ -41,7 +41,7 @@ namespace KeySkills.Crawler.Core.Tests
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
                 public void ReturnLink(string link) =>
-                    new StackoverflowJobBoardClient.JobPost { 
+                    new StackoverflowClient.JobPost { 
                         Link = link,
                         PublishedDateString = _correctPublishedDateString
                     }.GetVacancy().Link.Should().Be(link);
@@ -49,7 +49,7 @@ namespace KeySkills.Crawler.Core.Tests
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
                 public void ReturnTitle(string title) =>
-                    new StackoverflowJobBoardClient.JobPost { 
+                    new StackoverflowClient.JobPost { 
                         Title = title,
                         PublishedDateString = _correctPublishedDateString
                     }.GetVacancy().Title.Should().Be(title);
@@ -57,7 +57,7 @@ namespace KeySkills.Crawler.Core.Tests
                 [Theory]
                 [MemberData(nameof(LoremIpsum))]
                 public void ReturnDescription(string description) =>
-                    new StackoverflowJobBoardClient.JobPost { 
+                    new StackoverflowClient.JobPost { 
                         Description = description,
                         PublishedDateString = _correctPublishedDateString
                     }.GetVacancy().Description.Should().Be(description);
@@ -106,8 +106,8 @@ namespace KeySkills.Crawler.Core.Tests
         {
             private Uri _baseUri = new Uri("https://stackoverflow.com");
             
-            private StackoverflowJobBoardClient GetStackoverflowJobBoardClient(HttpMessageHandler handler) =>
-                new StackoverflowJobBoardClient(
+            private StackoverflowClient GetStackoverflowClient(HttpMessageHandler handler) =>
+                new StackoverflowClient(
                     new HttpClient(handler) {
                         BaseAddress = _baseUri
                     });
@@ -135,7 +135,7 @@ namespace KeySkills.Crawler.Core.Tests
                         StatusCode = HttpStatusCode.OK
                     });
                 
-                GetStackoverflowJobBoardClient(httpMessageHandler.Object)
+                GetStackoverflowClient(httpMessageHandler.Object)
                     .GetVacancies().ToList();
                 
                 httpMessageHandler.Protected().Verify(
@@ -196,7 +196,7 @@ namespace KeySkills.Crawler.Core.Tests
             [Theory]
             [MemberData(nameof(CorrectlyDeserializeResponseData))]
             public async void CorrectlyDeserializeResponse(string responseContent, IEnumerable<Vacancy> expected) =>            
-                (await GetStackoverflowJobBoardClient(
+                (await GetStackoverflowClient(
                     GetHttpMessageHandlerMock(
                         expectedResponse: new HttpResponseMessage() { 
                             StatusCode = HttpStatusCode.OK,
