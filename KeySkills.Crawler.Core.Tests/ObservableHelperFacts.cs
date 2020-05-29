@@ -14,7 +14,7 @@ namespace KeySkills.Crawler.Core.Tests
         {
             [Fact]
             public async void ReturnExpectedResult() =>
-                (await ObservableHelper.Generate(
+                (await ObservableHelper.GenerateFromAsync(
                         () => Task.Run(() => 0),
                         prev => prev < 3,
                         prev => Task.Run(() => prev + 1),
@@ -24,7 +24,7 @@ namespace KeySkills.Crawler.Core.Tests
             
             [Fact]
             public async void ReturnInitialStateWithoutCondition() =>
-                (await ObservableHelper.Generate(
+                (await ObservableHelper.GenerateFromAsync(
                         () => Task.Run(() => 0),
                         prev => prev < 0,
                         prev => Task.Run(() => prev / 0), // this shouldn't be invoked
@@ -35,7 +35,7 @@ namespace KeySkills.Crawler.Core.Tests
             public static TheoryData<IObservable<int>> ThrowData =>
                 new TheoryData<IObservable<int>> {
                     {
-                        ObservableHelper.Generate(
+                        ObservableHelper.GenerateFromAsync(
                             () => Task.Run(() => { 
                                 var x = 0;
                                 return 0 / x; // throw on initialization
@@ -46,7 +46,7 @@ namespace KeySkills.Crawler.Core.Tests
                         )
                     },
                     {
-                        ObservableHelper.Generate(
+                        ObservableHelper.GenerateFromAsync(
                             () => Task.Run(() => 0),
                             prev => prev / 0 < 3, // throw on checking condition
                             prev => Task.Run(() => prev + 1), 
@@ -54,7 +54,7 @@ namespace KeySkills.Crawler.Core.Tests
                         )
                     },
                     {
-                        ObservableHelper.Generate(
+                        ObservableHelper.GenerateFromAsync(
                             () => Task.Run(() => 0),
                             prev => prev < 3,
                             prev => Task.Run(() => prev / 0), // throw on iteration
@@ -62,7 +62,7 @@ namespace KeySkills.Crawler.Core.Tests
                         )
                     },
                     {
-                        ObservableHelper.Generate(
+                        ObservableHelper.GenerateFromAsync(
                             () => Task.Run(() => 0),
                             prev => prev < 3, 
                             prev => Task.Run(() => prev + 1), 

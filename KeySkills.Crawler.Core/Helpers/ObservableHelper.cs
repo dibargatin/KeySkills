@@ -7,7 +7,7 @@ namespace KeySkills.Crawler.Core.Helpers
 {
     public class ObservableHelper
     {
-        public static IObservable<TResult> Generate<TState, TResult>(
+        public static IObservable<TResult> GenerateFromAsync<TState, TResult>(
             Func<Task<TState>> initialState,
             Func<TState, bool> condition,
             Func<TState, Task<TState>> iterate,
