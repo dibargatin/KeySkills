@@ -12,8 +12,13 @@ namespace KeySkills.Crawler.Core
     {
         protected readonly HttpClient _http;
 
-        public BaseJobBoardClient(HttpClient http) =>
+        protected readonly Func<string, bool> _isVacancyExisted;
+
+        public BaseJobBoardClient(HttpClient http, Func<string, bool> isVacancyExisted)
+        {
             _http = http ?? throw new ArgumentNullException(nameof(http));
+            _isVacancyExisted = isVacancyExisted ?? throw new ArgumentNullException(nameof(isVacancyExisted));
+        }
         
         public abstract IObservable<Vacancy> GetVacancies();
 

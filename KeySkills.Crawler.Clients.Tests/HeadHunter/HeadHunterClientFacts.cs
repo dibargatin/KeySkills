@@ -287,6 +287,15 @@ namespace KeySkills.Crawler.Clients.Tests
 
             [Theory]
             [MemberData(nameof(ExpectedResponseData))]
+            public async void FilterOutExistedVacancies(ExpectedResponse expected) =>
+                (await GetHeadHunterClient(
+                        handler: expected.GetHttpMessageHandlerMock().Object,
+                        isVacancyExisted: true // should filter out all vacancies
+                    ).GetVacancies().ToList().ToTask()
+                ).Should().BeEmpty();
+
+            [Theory]
+            [MemberData(nameof(ExpectedResponseData))]
             public async void MakeHttpGetRequests(ExpectedResponse expected)
             {
                 var handlerMock = expected.GetHttpMessageHandlerMock();

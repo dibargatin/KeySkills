@@ -12,7 +12,20 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
     {
         private readonly IRequestFactory _requestFactory;
 
-        public StackoverflowClient(HttpClient http, IRequestFactory requestFactory) : base(http) =>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StackoverflowClient"/> class
+        /// </summary>
+        /// <param name="http">Instance of HttpClient to make API requests</param>
+        /// <param name="requestFactory">Instance of IRequestFactory to get required requests</param>
+        /// <param name="isVacancyExisted">Predicate for filtering already downloaded vacancies by URL</param>
+        /// <exception cref="ArgumentNullException"><paramref name="http"/> is <see langword="null" /></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="requestFactory"/> is <see langword="null" /></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="isVacancyExisted"/> is <see langword="null" /></exception>
+        public StackoverflowClient(
+            HttpClient http, 
+            IRequestFactory requestFactory,
+            Func<string, bool> isVacancyExisted
+        ) : base(http, isVacancyExisted) =>
             _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
 
         public override IObservable<Vacancy> GetVacancies() =>
@@ -21,6 +34,7 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
                 Deserializer.Xml.Default
             ).ToObservable()
             .SelectMany(list => list.Posts)
-            .Select(job => job.GetVacancy());
+            .Select(job => job.GetVacancy())
+            .Where(vacancy => !_isVacancyExisted(vacancy.Link));
     }
 }

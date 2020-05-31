@@ -12,7 +12,6 @@ namespace KeySkills.Crawler.Clients.HeadHunter
     public partial class HeadHunterClient : BaseJobBoardClient
     {
         private readonly IRequestFactory _requestFactory;
-        private readonly Func<string, bool> _isVacancyExisted;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeadHunterClient"/> class
@@ -27,11 +26,8 @@ namespace KeySkills.Crawler.Clients.HeadHunter
             HttpClient http, 
             IRequestFactory requestFactory, 
             Func<string, bool> isVacancyExisted
-            ) : base(http)
-        {
+        ) : base(http, isVacancyExisted) =>
             _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
-            _isVacancyExisted = isVacancyExisted ?? throw new ArgumentNullException(nameof(isVacancyExisted));
-        }
         
         public override IObservable<Vacancy> GetVacancies() =>
             GetItems()
