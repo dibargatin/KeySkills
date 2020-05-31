@@ -3,10 +3,10 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
-using KeySkills.Crawler.Core.Helpers;
+using KeySkills.Crawler.Clients.Helpers;
 using Xunit;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Crawler.Clients.Tests
 {
     public class ObservableHelperFacts
     {

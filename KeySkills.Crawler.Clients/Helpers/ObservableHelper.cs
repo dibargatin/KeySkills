@@ -3,7 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace KeySkills.Crawler.Core.Helpers
+namespace KeySkills.Crawler.Clients.Helpers
 {
     public class ObservableHelper
     {
