@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reactive.Threading.Tasks;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Clients.Stackoverflow;
+using static KeySkills.Crawler.Clients.Stackoverflow.StackoverflowClient;
 
 namespace KeySkills.Crawler.Clients.Tests
 {
@@ -22,13 +23,12 @@ namespace KeySkills.Crawler.Clients.Tests
     {
         public class GetVacancies_Should
         {
-            private Uri _baseUri = new Uri("https://stackoverflow.com");
-            
+            private RequestFactory _requestFactory = new RequestFactory {
+                EndpointUri = new Uri("https://stackoverflow.com/jobs/feed")
+            };
+
             private StackoverflowClient GetStackoverflowClient(HttpMessageHandler handler) =>
-                new StackoverflowClient(
-                    new HttpClient(handler) {
-                        BaseAddress = _baseUri
-                    });
+                new StackoverflowClient(new HttpClient(handler), _requestFactory);
 
             private Mock<HttpMessageHandler> GetHttpMessageHandlerMock(HttpResponseMessage expectedResponse)
             {
@@ -61,7 +61,7 @@ namespace KeySkills.Crawler.Clients.Tests
                     Times.Exactly(1), // Only single GET request is expected
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.Method == HttpMethod.Get
-                        && req.RequestUri == new Uri(_baseUri, "/jobs/feed")
+                        && req.RequestUri == _requestFactory.EndpointUri
                     ),
                     ItExpr.IsAny<CancellationToken>()
                 );

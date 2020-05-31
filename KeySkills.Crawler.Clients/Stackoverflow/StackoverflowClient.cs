@@ -10,11 +10,14 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
 {
     public partial class StackoverflowClient : BaseJobBoardClient
     {
-        public StackoverflowClient(HttpClient http) : base(http) {}
+        private readonly IRequestFactory _requestFactory;
+
+        public StackoverflowClient(HttpClient http, IRequestFactory requestFactory) : base(http) =>
+            _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
 
         public override IObservable<Vacancy> GetVacancies() =>
             ExecuteRequest<Response.JobPostCollection>(
-                new HttpRequestMessage(HttpMethod.Get, "/jobs/feed"), 
+                _requestFactory.CreateRequest(), 
                 Deserializer.Xml.Default
             ).ToObservable()
             .SelectMany(list => list.Posts)
