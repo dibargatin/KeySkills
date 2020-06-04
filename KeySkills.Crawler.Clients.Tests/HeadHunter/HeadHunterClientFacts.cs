@@ -11,6 +11,7 @@ using FluentAssertions;
 using FluentAssertions.Extensions;
 using KeySkills.Crawler.Clients.HeadHunter;
 using KeySkills.Crawler.Core.Models;
+using KeySkills.Crawler.Core.Services;
 using Moq;
 using Moq.Protected;
 using Xunit;
@@ -207,7 +208,8 @@ namespace KeySkills.Crawler.Clients.Tests
                             CountryCode = Country.RU,
                             Description = description,
                             Title = name,
-                            PublishedAt = publishedAt
+                            PublishedAt = publishedAt,
+                            Keywords = Enumerable.Empty<Keyword>()
                         });
 
                     return this;
@@ -225,11 +227,27 @@ namespace KeySkills.Crawler.Clients.Tests
                     }
                 };
             
-            private HeadHunterClient GetHeadHunterClient(HttpMessageHandler handler, bool isVacancyExisted = false) =>
+            private static Mock<IKeywordsExtractor> GetKeywordsExtractorMock() 
+            {
+                var mock = new Mock<IKeywordsExtractor>();
+                
+                mock.Setup(e => e.Extract(It.IsAny<Vacancy>()))
+                    .Returns(Observable.Empty<Keyword>())
+                    .Verifiable();
+
+                return mock;
+            }
+
+            private HeadHunterClient GetHeadHunterClient(
+                HttpMessageHandler handler, 
+                bool isVacancyExisted = false,
+                IKeywordsExtractor keywordsExtractor = null
+            ) =>
                 new HeadHunterClient(
                     new HttpClient(handler),
                     _requestFactory,
-                    _ => isVacancyExisted
+                    _ => isVacancyExisted,
+                    keywordsExtractor ?? GetKeywordsExtractorMock().Object
                 );
 
             private static string GetJobPostWebApiUrl(string id) =>
@@ -303,6 +321,24 @@ namespace KeySkills.Crawler.Clients.Tests
                 var vacancies = await GetHeadHunterClient(handlerMock.Object).GetVacancies().ToList().ToTask();
 
                 expected.VerifyHttpMessageHandlerMock(handlerMock);
+            }
+
+            [Theory]
+            [MemberData(nameof(ExpectedResponseData))]
+            public async void InvokeKeywordsExtractor(ExpectedResponse expected)
+            {
+                var keywordsExtractorMock = GetKeywordsExtractorMock();
+
+                var vacancies = await GetHeadHunterClient(
+                        handler: expected.GetHttpMessageHandlerMock().Object,
+                        isVacancyExisted: false,
+                        keywordsExtractor: keywordsExtractorMock.Object
+                    ).GetVacancies().ToList().ToTask();
+
+                keywordsExtractorMock.Verify(
+                    k => k.Extract(It.IsAny<Vacancy>()), 
+                    Times.Exactly(expected.Vacancies.Count())
+                );
             }
         }
     }

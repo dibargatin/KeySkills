@@ -16,6 +16,7 @@ using System.Reactive.Threading.Tasks;
 using KeySkills.Crawler.Core.Helpers;
 using KeySkills.Crawler.Clients.Stackoverflow;
 using static KeySkills.Crawler.Clients.Stackoverflow.StackoverflowClient;
+using KeySkills.Crawler.Core.Services;
 
 namespace KeySkills.Crawler.Clients.Tests
 {
@@ -26,9 +27,29 @@ namespace KeySkills.Crawler.Clients.Tests
             private RequestFactory _requestFactory = new RequestFactory {
                 EndpointUri = new Uri("https://stackoverflow.com/jobs/feed")
             };
+            
+            private static Mock<IKeywordsExtractor> GetKeywordsExtractorMock() 
+            {
+                var mock = new Mock<IKeywordsExtractor>();
+                
+                mock.Setup(e => e.Extract(It.IsAny<Vacancy>()))
+                    .Returns(Observable.Empty<Keyword>())
+                    .Verifiable();
 
-            private StackoverflowClient GetStackoverflowClient(HttpMessageHandler handler, bool isVacancyExisted = false) =>
-                new StackoverflowClient(new HttpClient(handler), _requestFactory, _ => isVacancyExisted);
+                return mock;
+            }
+
+            private StackoverflowClient GetStackoverflowClient(
+                HttpMessageHandler handler, 
+                bool isVacancyExisted = false,
+                IKeywordsExtractor keywordsExtractor = null
+            ) =>
+                new StackoverflowClient(
+                    new HttpClient(handler),
+                    _requestFactory, 
+                    _ => isVacancyExisted,
+                    keywordsExtractor ?? GetKeywordsExtractorMock().Object
+                );
 
             private Mock<HttpMessageHandler> GetHttpMessageHandlerMock(HttpResponseMessage expectedResponse)
             {
@@ -72,14 +93,16 @@ namespace KeySkills.Crawler.Clients.Tests
                     Link = "abc",
                     Title = "xyz",
                     Description = "qwerty",
-                    PublishedAt = 1.March(2020).At(12, 0).AsUtc()
+                    PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
+                    Keywords = Enumerable.Empty<Keyword>()
                 },
                 new Vacancy {
                     Link = "zzz",
                     Title = "yyy",
                     Description = "asdfg",
                     PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
-                    CountryCode = Country.FR
+                    CountryCode = Country.FR,
+                    Keywords = Enumerable.Empty<Keyword>()
                 }
             };
 
@@ -131,6 +154,25 @@ namespace KeySkills.Crawler.Clients.Tests
                         isVacancyExisted: true // should filter out all vacancies
                     ).GetVacancies().ToList().ToTask()
                 ).Should().BeEmpty();
+
+            
+            [Theory]
+            [MemberData(nameof(ExpectedResponseData))]
+            public async void InvokeKeywordsExtractor(HttpResponseMessage response, IEnumerable<Vacancy> expected)
+            {
+                var keywordsExtractorMock = GetKeywordsExtractorMock();
+
+                var vacancies = await GetStackoverflowClient(
+                        handler: GetHttpMessageHandlerMock(response).Object,
+                        isVacancyExisted: false,
+                        keywordsExtractor: keywordsExtractorMock.Object
+                    ).GetVacancies().ToList().ToTask();
+
+                keywordsExtractorMock.Verify(
+                    k => k.Extract(It.IsAny<Vacancy>()), 
+                    Times.Exactly(expected.Count())
+                );
+            }
         }
     }
 }
