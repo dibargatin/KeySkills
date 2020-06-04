@@ -3,6 +3,9 @@ using KeySkills.Crawler.Core.Models;
 
 namespace KeySkills.Crawler.Core.Services
 {
+    /// <summary>
+    /// Defines keywords extractor interface
+    /// </summary>
     public interface IKeywordsExtractor
     {
         /// <summary>

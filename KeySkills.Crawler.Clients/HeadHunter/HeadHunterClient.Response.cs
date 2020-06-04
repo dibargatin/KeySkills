@@ -8,8 +8,14 @@ namespace KeySkills.Crawler.Clients.HeadHunter
 {
     public partial class HeadHunterClient
     {
+        /// <summary>
+        /// Contains HeadHunter API response structures
+        /// </summary>
         public class Response
         {
+            /// <summary>
+            /// Represents response of the root endpoint
+            /// </summary>
             public class Root
             {
                 [JsonPropertyName("items")]
@@ -37,6 +43,9 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 public string AlternateUrl { get; set; }
             }
 
+            /// <summary>
+            /// Represents job post details
+            /// </summary>
             public class JobPost
             {
                 /// <summary>
@@ -69,6 +78,11 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 [JsonPropertyName("alternate_url")]
                 public string AlternateUrl { get; set; }
 
+                /// <summary>
+                /// Converts job post details to the <see cref="Vacancy"/>
+                /// </summary>
+                /// <param name="getAreaInfoFunc">Function to get area information</param>
+                /// <returns>New instance of <see cref="Vacancy"/></returns>
                 public async Task<Vacancy> GetVacancy(Func<string, Task<AreaInfo>> getAreaInfoFunc) =>
                     new Vacancy {
                         Link = AlternateUrl,
@@ -86,6 +100,11 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 [JsonPropertyName("id")]
                 public string Id { get; set; }
 
+                /// <summary>
+                /// Returns <see cref="Country"/> which is related to the area
+                /// </summary>
+                /// <param name="getAreaInfoFunc">Function to get area information</param>
+                /// <returns><see cref="Country"/> or <see langword="null"/></returns>
                 public async Task<Country?> GetCountry(Func<string, Task<AreaInfo>> getAreaInfoFunc) 
                 {
                     async Task<Country?> GetCountryByAreaId(string id) =>
@@ -98,6 +117,9 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 }
             }
 
+            /// <summary>
+            /// Represents response of the areas endpoint
+            /// </summary>
             public class AreaInfo
             {
                 [JsonPropertyName("id")]

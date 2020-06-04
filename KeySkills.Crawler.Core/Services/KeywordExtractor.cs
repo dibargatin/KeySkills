@@ -7,10 +7,17 @@ using KeySkills.Crawler.Core.Models;
 
 namespace KeySkills.Crawler.Core.Services
 {
+    /// <summary>
+    /// Implements <see cref="IKeywordsExtractor"/>
+    /// </summary>
     public class KeywordExtractor : IKeywordsExtractor
     {
         private readonly IEnumerable<(Keyword keyword, Regex regex)> _keywords;
         
+        /// <summary>
+        /// Initializes instance of keyword extractor
+        /// </summary>
+        /// <param name="keywords">Collection of the keywords to be extracted</param>
         public KeywordExtractor(IEnumerable<Keyword> keywords) =>
             _keywords = keywords.Select(keyword => (
                 keyword, 
@@ -18,6 +25,7 @@ namespace KeySkills.Crawler.Core.Services
                     RegexOptions.Compiled | RegexOptions.IgnoreCase)
                 ));
 
+        /// <inheritdoc/>
         public IObservable<Keyword> Extract(Vacancy vacancy) =>
             Observable.Return(String.Concat(vacancy.Title, " ", vacancy.Description))
                 .SelectMany(vacancyText =>

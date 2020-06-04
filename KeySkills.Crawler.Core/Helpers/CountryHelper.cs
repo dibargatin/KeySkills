@@ -7,11 +7,24 @@ using KeySkills.Crawler.Core.Models;
 
 namespace KeySkills.Crawler.Core.Helpers
 {
+    /// <summary>
+    /// Contains helper methods for Country enum
+    /// </summary>
     public static class CountryHelper
     {
+        /// <summary>
+        /// Returns english country name by country code
+        /// </summary>
+        /// <param name="code">Country code</param>
+        /// <returns>English country name </returns>
         public static string GetCountryName(Country code) =>
             (new RegionInfo(code.ToString())).EnglishName;
 
+        /// <summary>
+        /// Tries to get country code by region name
+        /// </summary>
+        /// <param name="regionName">Region name on any language</param>
+        /// <returns><see cref="Country"/> or <see langword="null"/></returns>
         public static Country? TryGetCountryByName(string regionName)
         {
             if(regionName != null)
@@ -41,6 +54,10 @@ namespace KeySkills.Crawler.Core.Helpers
                         ))
             );
         
+        /// <summary>
+        /// Checks string to be a US state code
+        /// </summary>
+        /// <returns><see langword="true"/> when string is a US state code, or <see langword="false"/> otherwise</returns>
         public static bool IsUsaState(string code) =>
             _usaState.Value.Contains(code);
 

@@ -6,30 +6,56 @@ namespace KeySkills.Crawler.Clients.HeadHunter
 {
     public partial class HeadHunterClient
     {
+        /// <summary>
+        /// Defines request factory interface for HeadHunter API
+        /// </summary>
         public interface IRequestFactory
         {
+            /// <summary>
+            /// Creates request to the root endpoint
+            /// </summary>
+            /// <param name="page">Number of the requested page</param>
+            /// <returns>HTTP request to the root endpoint</returns>
             HttpRequestMessage CreateRootRequest(int page);
+
+            /// <summary>
+            /// Creates request to get job details
+            /// </summary>
+            /// <param name="url">URL of the job post</param>
+            /// <returns>HTTP request to get job details</returns>
             HttpRequestMessage CreateJobDetailsRequest(string url);
+
+            /// <summary>
+            /// Creates request to get information about job location
+            /// </summary>
+            /// <param name="id">Area Id</param>
+            /// <returns>HTTP request to the areas endpoint</returns>
             HttpRequestMessage CreateAreaRequest(string id);
         }
 
+        /// <summary>
+        /// Implements <see cref="IRequestFactory"/>
+        /// </summary>
         public class RequestFactory : IRequestFactory
         {
+            /// <summary>
+            /// Represents parameters for the root endpoint
+            /// </summary>
             public class RootRequestParams
             {
                 /// <summary>
-                /// Root endpoint relative URL
+                /// Gets or sets root endpoint relative URL
                 /// </summary>
                 public string Url { get; set; }
 
                 /// <summary>
-                /// Text to search for OR query
+                /// Gets or sets text to search for OR query
                 /// See query syntax on https://hh.ru/article/1175
                 /// </summary>
                 public string Text { get; set; }
 
                 /// <summary>
-                /// Industry to search
+                /// Gets or sets industry to search
                 /// See possible values on https://api.hh.ru/industries
                 /// </summary>
                 public string Industry { get; set; }  
@@ -44,6 +70,11 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                         String.Concat(name, "=", Uri.EscapeDataString(value), (isLast ? String.Empty : "&")) :
                         String.Empty;
 
+                /// <summary>
+                /// Prepares query string
+                /// </summary>
+                /// <param name="page">Number of the requested page</param>
+                /// <returns>Query string</returns>
                 public string GetQueryString(int page) =>
                     new StringBuilder()
                         .Append(Url == null ? String.Empty : Uri.EscapeUriString(Url)).Append("?")
@@ -69,13 +100,16 @@ namespace KeySkills.Crawler.Clients.HeadHunter
             /// </summary>
             public string AreaUrl { get; set; }
 
+            /// <inheritdoc/>
             public HttpRequestMessage CreateRootRequest(int page) =>
                 new HttpRequestMessage(HttpMethod.Get, 
                     new Uri(BaseUri, RootParams.GetQueryString(page)));
 
+            /// <inheritdoc/>
             public HttpRequestMessage CreateJobDetailsRequest(string url) =>
                 new HttpRequestMessage(HttpMethod.Get, url);
 
+            /// <inheritdoc/>
             public HttpRequestMessage CreateAreaRequest(string id) =>
                 new HttpRequestMessage(HttpMethod.Get, 
                     new Uri(BaseUri, AreaUrl != null ?

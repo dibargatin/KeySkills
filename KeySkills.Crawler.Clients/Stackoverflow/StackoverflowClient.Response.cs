@@ -9,6 +9,9 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
 {
     public partial class StackoverflowClient
     {
+        /// <summary>
+        /// Contains Stackoverflow API response structures
+        /// </summary>
         public class Response
         {
             [XmlRoot("rss")]
@@ -19,6 +22,9 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
                 public JobPost[] Posts { get; set; }
             }
             
+            /// <summary>
+            /// Represents job post details
+            /// </summary>
             public class JobPost
             {
                 [XmlElement("link")]
@@ -36,6 +42,9 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
                 [XmlElement("location", Namespace="http://stackoverflow.com/jobs/")]
                 public string Location { get; set; }
 
+                /// <summary>
+                /// Converts job post details to the <see cref="Vacancy"/>
+                /// </summary>
                 public Vacancy GetVacancy() => 
                     new Vacancy {
                         Link = Link,

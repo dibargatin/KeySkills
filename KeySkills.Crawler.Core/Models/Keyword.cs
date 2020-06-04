@@ -6,12 +6,12 @@ namespace KeySkills.Crawler.Core.Models
     public class Keyword
     {
         /// <summary>
-        /// Keyword display name
+        /// Gets or sets the keyword display name
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Regex pattern to match the keyword
+        /// Gets or sets the regex pattern to match the keyword
         /// </summary>
         public string Pattern { get; set; }
     }
