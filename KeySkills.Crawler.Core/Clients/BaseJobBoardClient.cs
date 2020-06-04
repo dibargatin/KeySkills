@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using KeySkills.Crawler.Core.Models;
 using KeySkills.Crawler.Core.Services;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Core.Clients
 {
     /// <summary>
     /// Base implementation of a vacancies provider interface

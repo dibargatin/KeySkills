@@ -1,7 +1,7 @@
 using System;
 using KeySkills.Crawler.Core.Models;
 
-namespace KeySkills.Crawler.Core
+namespace KeySkills.Crawler.Core.Clients
 {
     /// <summary>
     /// Defines a provider of vacancies
