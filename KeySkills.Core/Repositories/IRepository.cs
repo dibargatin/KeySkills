@@ -24,45 +24,27 @@ namespace KeySkills.Core.Repositories
         Task<IEnumerable<T>> GetAsync(Func<T, bool> predicate);
 
         /// <summary>
-        /// Creates entity
+        /// Adds entity
         /// </summary>
-        /// <param name="entity">Entity to create</param>
-        Task CreateAsync(T entity);
+        /// <param name="entity">Entity to add</param>
+        Task<T> AddAsync(T entity);
 
         /// <summary>
-        /// Creates entities
+        /// Adds entities
         /// </summary>
-        /// <param name="entities">Entities to create</param>
-        Task CreateAsync(IEnumerable<T> entities);
+        /// <param name="entities">Entities to add</param>
+        Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities);
 
         /// <summary>
         /// Updates existed entity
         /// </summary>
         /// <param name="entity">Entity to update</param>
-        Task UpdateAsync(T entity);
-
-        /// <summary>
-        /// Updates existed entities
-        /// </summary>
-        /// <param name="entities">Entities to update</param>
-        Task UpdateAsync(IEnumerable<T> entities);
+        Task<T> UpdateAsync(T entity);
 
         /// <summary>
         /// Deletes existed entity
         /// </summary>
         /// <param name="entity">Entity to delete</param>
         Task DeleteAsync(T entity);
-
-        /// <summary>
-        /// Deletes existed entities
-        /// </summary>
-        /// <param name="entities">Entities to delete</param>
-        Task DeleteAsync(IEnumerable<T> entities);
-
-        /// <summary>
-        /// Deletes existed entities matched to predicate
-        /// </summary>
-        /// <param name="predicate">Predicate to filter entities</param>
-        Task DeleteAsync(Func<T, bool> predicate);
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace KeySkills.Core.Models
 {
     /// <summary>
@@ -5,6 +7,11 @@ namespace KeySkills.Core.Models
     /// </summary>
     public class Keyword
     {
+        /// <summary>
+        /// Gets or sets keyword id
+        /// </summary>
+        public int KeywordId { get; set; }
+
         /// <summary>
         /// Gets or sets the keyword display name
         /// </summary>
@@ -14,5 +21,10 @@ namespace KeySkills.Core.Models
         /// Gets or sets the regex pattern to match the keyword
         /// </summary>
         public string Pattern { get; set; }
+
+        /// <summary>
+        /// Gets or sets vacancies with the keyword
+        /// </summary>
+        public IEnumerable<Vacancy> Vacancies { get; set; }
     }
 }

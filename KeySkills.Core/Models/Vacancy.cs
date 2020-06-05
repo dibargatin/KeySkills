@@ -9,6 +9,11 @@ namespace KeySkills.Core.Models
     public class Vacancy
     {
         /// <summary>
+        /// Gets or sets vacancy id
+        /// </summary>
+        public int VacancyId { get; set; }
+
+        /// <summary>
         /// Gets or sets the vacancy webpage URL
         /// </summary>
         public string Link { get; set; }
