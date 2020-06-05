@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 
-namespace KeySkills.Crawler.Core.Helpers
+namespace KeySkills.Core.Helpers
 {
     /// <summary>
     /// Contains helper methods for Country enum

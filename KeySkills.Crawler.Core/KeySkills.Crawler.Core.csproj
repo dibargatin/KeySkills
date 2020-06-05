@@ -8,4 +8,8 @@
     <PackageReference Include="System.Reactive" Version="4.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KeySkills.Core\KeySkills.Core.csproj" />
+  </ItemGroup>
+
 </Project>

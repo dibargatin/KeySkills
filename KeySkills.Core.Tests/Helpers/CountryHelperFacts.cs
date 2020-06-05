@@ -1,10 +1,10 @@
 using Xunit;
 using FluentAssertions;
-using KeySkills.Crawler.Core.Helpers;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Helpers;
+using KeySkills.Core.Models;
 using System;
 
-namespace KeySkills.Crawler.Core.Tests
+namespace KeySkills.Core.Tests
 {
     public class CountryHelperFacts
     {

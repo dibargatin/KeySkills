@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using FluentAssertions;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 using KeySkills.Crawler.Core.Services;
 using Xunit;
 

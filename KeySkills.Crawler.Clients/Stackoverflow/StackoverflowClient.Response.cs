@@ -2,8 +2,8 @@ using System;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Globalization;
-using KeySkills.Crawler.Core.Helpers;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Helpers;
+using KeySkills.Core.Models;
 
 namespace KeySkills.Crawler.Clients.Stackoverflow
 {

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using KeySkills.Crawler.Clients.HeadHunter;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 using KeySkills.Crawler.Core.Services;
 using Moq;
 using Moq.Protected;

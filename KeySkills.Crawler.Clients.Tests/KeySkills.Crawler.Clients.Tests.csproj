@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\KeySkills.Crawler.Clients\KeySkills.Crawler.Clients.csproj" />
     <ProjectReference Include="..\KeySkills.Crawler.Core\KeySkills.Crawler.Core.csproj" />
+    <ProjectReference Include="..\KeySkills.Core\KeySkills.Core.csproj" />
   </ItemGroup>
 
 </Project>

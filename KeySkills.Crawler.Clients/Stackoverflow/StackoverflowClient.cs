@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Linq;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 using KeySkills.Crawler.Core.Services;
 using KeySkills.Crawler.Core.Clients;
 

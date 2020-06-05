@@ -1,4 +1,4 @@
-namespace KeySkills.Crawler.Core.Models
+namespace KeySkills.Core.Models
 {
     /// <summary>
     /// ISO 3166 country codes

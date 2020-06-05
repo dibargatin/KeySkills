@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Extensions;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 using Xunit;
 using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient.Response;
 

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 using KeySkills.Crawler.Core.Services;
 
 namespace KeySkills.Crawler.Core.Clients

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace KeySkills.Crawler.Core.Repositories
+namespace KeySkills.Core.Repositories
 {
     /// <summary>
     /// Generic repository interface

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 
 namespace KeySkills.Crawler.Core.Services
 {

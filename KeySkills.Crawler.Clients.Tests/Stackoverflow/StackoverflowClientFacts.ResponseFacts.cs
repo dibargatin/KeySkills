@@ -2,8 +2,7 @@ using System;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Extensions;
-using KeySkills.Crawler.Core.Models;
-using System.Reactive.Linq;
+using KeySkills.Core.Models;
 using static KeySkills.Crawler.Clients.Stackoverflow.StackoverflowClient;
 
 namespace KeySkills.Crawler.Clients.Tests

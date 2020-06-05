@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace KeySkills.Crawler.Core.Models
+namespace KeySkills.Core.Models
 {
     /// <summary>
     /// Represents a vacancy

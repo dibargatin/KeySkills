@@ -1,5 +1,5 @@
 using System;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 
 namespace KeySkills.Crawler.Core.Services
 {

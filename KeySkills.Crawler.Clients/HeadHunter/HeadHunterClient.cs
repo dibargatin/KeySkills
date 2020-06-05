@@ -3,10 +3,10 @@ using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using KeySkills.Crawler.Clients.Helpers;
-using KeySkills.Crawler.Core.Models;
 using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient.Response;
 using KeySkills.Crawler.Core.Services;
 using KeySkills.Crawler.Core.Clients;
+using KeySkills.Core.Models;
 
 namespace KeySkills.Crawler.Clients.HeadHunter
 {

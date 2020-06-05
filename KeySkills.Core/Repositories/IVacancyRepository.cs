@@ -1,6 +1,6 @@
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Models;
 
-namespace KeySkills.Crawler.Core.Repositories
+namespace KeySkills.Core.Repositories
 {
     /// <summary>
     /// Vacancy repository interface

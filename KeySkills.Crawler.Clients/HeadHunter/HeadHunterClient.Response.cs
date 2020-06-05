@@ -1,8 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using KeySkills.Crawler.Core.Helpers;
-using KeySkills.Crawler.Core.Models;
+using KeySkills.Core.Helpers;
+using KeySkills.Core.Models;
 
 namespace KeySkills.Crawler.Clients.HeadHunter
 {
