@@ -88,69 +88,86 @@ namespace KeySkills.Crawler.Clients.Tests
                 );
             }
 
-            private static Vacancy[] _vacancies = new[] {
-                new Vacancy {
-                    Link = "abc",
-                    Title = "xyz",
-                    Description = "qwerty",
-                    PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
-                    Keywords = Enumerable.Empty<Keyword>()
-                },
-                new Vacancy {
-                    Link = "zzz",
-                    Title = "yyy",
-                    Description = "asdfg",
-                    PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
-                    CountryCode = Country.FR,
-                    Keywords = Enumerable.Empty<Keyword>()
-                }
-            };
+            public class ExpectedResponse
+            {
+                public IEnumerable<Vacancy> Vacancies { get; set; }
 
-            private static IEnumerable<T> Single<T>(T item) => new[] { item };
+                public ExpectedResponse(IEnumerable<Vacancy> vacancies) =>
+                    Vacancies = vacancies ?? throw new ArgumentNullException(nameof(vacancies));
 
-            private static string VacancyToXml(Vacancy vacancy) => 
-                $@"<item>
-                    <link>{vacancy.Link}</link>
-                    <title>{vacancy.Title}</title>
-                    <description>{vacancy.Description}</description>
-                    <pubDate>{vacancy.PublishedAt.ToString("O")}</pubDate>
-                    {(
-                        vacancy.CountryCode.HasValue ?
-                            $@"<location xmlns='http://stackoverflow.com/jobs/'>City, {
-                                CountryHelper.GetCountryName(vacancy.CountryCode.Value)
-                            }</location>" :
-                            String.Empty
-                    )}
-                </item>";
+                public ExpectedResponse(Vacancy vacancy) : this(new[] { vacancy }) {}
 
-            private static string VacanciesToXml(IEnumerable<Vacancy> vacancies) =>
-                $@"<rss><channel>{
-                    String.Join(String.Empty, vacancies.Select(v => VacancyToXml(v)))
-                }</channel></rss>";
-            
-            private static HttpResponseMessage CreateResponse(string responseContent) =>
-                new HttpResponseMessage() { 
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseContent)
-                };
+                private string VacancyToXml(Vacancy vacancy) => 
+                    $@"<item>
+                        <link>{vacancy.Link}</link>
+                        <title>{vacancy.Title}</title>
+                        <description>{vacancy.Description}</description>
+                        <pubDate>{vacancy.PublishedAt.ToString("O")}</pubDate>
+                        {(
+                            vacancy.CountryCode.HasValue ?
+                                $@"<location xmlns='http://stackoverflow.com/jobs/'>City, {
+                                    CountryHelper.GetCountryName(vacancy.CountryCode.Value)
+                                }</location>" :
+                                String.Empty
+                        )}
+                    </item>";
 
-            public static TheoryData<HttpResponseMessage, IEnumerable<Vacancy>> ExpectedResponseData =>
-                new TheoryData<HttpResponseMessage, IEnumerable<Vacancy>> {
-                    { CreateResponse(VacanciesToXml(Single(_vacancies[0]))), Single(_vacancies[0]) },
-                    { CreateResponse(VacanciesToXml(_vacancies)), _vacancies }
+                private string VacanciesToXml(IEnumerable<Vacancy> vacancies) =>
+                    $@"<rss><channel>{
+                        String.Join(String.Empty, vacancies.Select(v => VacancyToXml(v)))
+                    }</channel></rss>";
+                
+                public HttpResponseMessage CreateResponse() =>
+                    new HttpResponseMessage() { 
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(VacanciesToXml(Vacancies))
+                    };
+            }
+
+            public static TheoryData<ExpectedResponse> ExpectedResponseData =>
+                new TheoryData<ExpectedResponse> {
+                    { 
+                        new ExpectedResponse(
+                            new Vacancy {
+                                Link = "abc",
+                                Title = "xyz",
+                                Description = "qwerty",
+                                PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
+                                Keywords = Enumerable.Empty<Keyword>()
+                            }) 
+                    },
+                    { 
+                        new ExpectedResponse(new[] {
+                            new Vacancy {
+                                Link = "yuit",
+                                Title = "ghj",
+                                Description = "dff",
+                                PublishedAt = 3.March(2020).At(12, 0).AsUtc(),
+                                Keywords = Enumerable.Empty<Keyword>()
+                            },
+                            new Vacancy {
+                                Link = "zzz",
+                                Title = "yyy",
+                                Description = "asdfg",
+                                PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
+                                CountryCode = Country.FR,
+                                Keywords = Enumerable.Empty<Keyword>()
+                            }
+                        })
+                    }
                 };
 
             [Theory]
             [MemberData(nameof(ExpectedResponseData))]
-            public async void ReturnExpectedResponse(HttpResponseMessage response, IEnumerable<Vacancy> expected) =>            
-                (await GetStackoverflowClient(GetHttpMessageHandlerMock(response).Object).GetVacancies().ToList().ToTask())
-                    .Should().BeEquivalentTo(expected);
+            public async void ReturnExpectedResponse(ExpectedResponse expected) =>            
+                (await GetStackoverflowClient(GetHttpMessageHandlerMock(expected.CreateResponse()).Object).GetVacancies().ToList().ToTask())
+                    .Should().BeEquivalentTo(expected.Vacancies);
 
             [Theory]
             [MemberData(nameof(ExpectedResponseData))]
-            public async void FilterOutExistedVacancies(HttpResponseMessage response, IEnumerable<Vacancy> nope) =>            
+            public async void FilterOutExistedVacancies(ExpectedResponse expected) =>            
                 (await GetStackoverflowClient(
-                        handler: GetHttpMessageHandlerMock(response).Object,
+                        handler: GetHttpMessageHandlerMock(expected.CreateResponse()).Object,
                         isVacancyExisted: true // should filter out all vacancies
                     ).GetVacancies().ToList().ToTask()
                 ).Should().BeEmpty();
@@ -158,19 +175,19 @@ namespace KeySkills.Crawler.Clients.Tests
             
             [Theory]
             [MemberData(nameof(ExpectedResponseData))]
-            public async void InvokeKeywordsExtractor(HttpResponseMessage response, IEnumerable<Vacancy> expected)
+            public async void InvokeKeywordsExtractor(ExpectedResponse expected)
             {
                 var keywordsExtractorMock = GetKeywordsExtractorMock();
 
                 var vacancies = await GetStackoverflowClient(
-                        handler: GetHttpMessageHandlerMock(response).Object,
+                        handler: GetHttpMessageHandlerMock(expected.CreateResponse()).Object,
                         isVacancyExisted: false,
                         keywordsExtractor: keywordsExtractorMock.Object
                     ).GetVacancies().ToList().ToTask();
 
                 keywordsExtractorMock.Verify(
                     k => k.Extract(It.IsAny<Vacancy>()), 
-                    Times.Exactly(expected.Count())
+                    Times.Exactly(expected.Vacancies.Count())
                 );
             }
         }
