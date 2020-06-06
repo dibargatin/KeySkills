@@ -209,7 +209,7 @@ namespace KeySkills.Crawler.Clients.Tests
                             Description = description,
                             Title = name,
                             PublishedAt = publishedAt,
-                            Keywords = Enumerable.Empty<Keyword>()
+                            Keywords = Enumerable.Empty<VacancyKeyword>()
                         });
 
                     return this;

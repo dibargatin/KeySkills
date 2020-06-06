@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Reactive.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -48,6 +49,23 @@ namespace KeySkills.Crawler.Core.Clients
         
         /// <inheritdoc/>
         public abstract IObservable<Vacancy> GetVacancies();
+
+        /// <summary>
+        /// Extracts keywords from the supplied vacancy and writes them back to the vacancy
+        /// </summary>
+        /// <param name="vacancy">Vacancy to extract keywords</param>
+        /// <returns>Vacancy with collection of extracted keywords</returns>
+        protected Vacancy ExtractKeywords(Vacancy vacancy)
+        {
+            vacancy.Keywords = Observable.ToEnumerable(
+                _keywordsExtractor.Extract(vacancy)
+                    .Select(keyword => new VacancyKeyword {
+                        KeywordId = keyword.KeywordId,
+                        Keyword = keyword
+                    })
+            );
+            return vacancy;
+        }
 
         /// <summary>
         /// Executes HTTP request to job board API

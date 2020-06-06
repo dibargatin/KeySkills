@@ -47,11 +47,6 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
             .SelectMany(list => list.Posts)
             .Select(job => job.GetVacancy())
             .Where(vacancy => !_isVacancyExisted(vacancy.Link))
-            .Select(vacancy => {
-                vacancy.Keywords = Observable.ToEnumerable(
-                    _keywordsExtractor.Extract(vacancy)
-                );
-                return vacancy;
-            });
+            .Select(vacancy => ExtractKeywords(vacancy));
     }
 }

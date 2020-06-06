@@ -45,12 +45,7 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 .Where(item => !_isVacancyExisted(item.AlternateUrl))
                 .SelectMany(item => Observable.FromAsync(async () => await GetJobDetails(item.Url)))
                 .SelectMany(job => Observable.FromAsync(async () => await job.GetVacancy(GetAreaInfo)))
-                .Select(vacancy => {
-                    vacancy.Keywords = Observable.ToEnumerable(
-                        _keywordsExtractor.Extract(vacancy)
-                    );
-                    return vacancy;
-                });
+                .Select(vacancy => ExtractKeywords(vacancy));
 
         private Task<Root> GetNextRoot(int page) =>
             ExecuteRequest<Root>(

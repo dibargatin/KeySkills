@@ -133,7 +133,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 Title = "xyz",
                                 Description = "qwerty",
                                 PublishedAt = 1.March(2020).At(12, 0).AsUtc(),
-                                Keywords = Enumerable.Empty<Keyword>()
+                                Keywords = Enumerable.Empty<VacancyKeyword>()
                             }) 
                     },
                     { 
@@ -143,7 +143,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 Title = "ghj",
                                 Description = "dff",
                                 PublishedAt = 3.March(2020).At(12, 0).AsUtc(),
-                                Keywords = Enumerable.Empty<Keyword>()
+                                Keywords = Enumerable.Empty<VacancyKeyword>()
                             },
                             new Vacancy {
                                 Link = "zzz",
@@ -151,7 +151,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 Description = "asdfg",
                                 PublishedAt = 2.March(2020).At(12, 0).AsUtc(),
                                 CountryCode = Country.FR,
-                                Keywords = Enumerable.Empty<Keyword>()
+                                Keywords = Enumerable.Empty<VacancyKeyword>()
                             }
                         })
                     }

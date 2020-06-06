@@ -42,6 +42,6 @@ namespace KeySkills.Core.Models
         /// <summary>
         /// Gets or sets the vacancy keywords
         /// </summary>
-        public IEnumerable<Keyword> Keywords { get; set; }
+        public IEnumerable<VacancyKeyword> Keywords { get; set; }
     }
 }
