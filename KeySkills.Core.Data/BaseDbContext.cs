@@ -1,3 +1,5 @@
+using System.Linq;
+using KeySkills.Core.Data.SeedData;
 using KeySkills.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -15,6 +17,8 @@ namespace KeySkills.Core.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateKeywordEntity(modelBuilder);
+            SeedKeywordEntityData(modelBuilder);
+
             CreateVacancyEntity(modelBuilder);
             CreateVacancyKeywordEntity(modelBuilder);
         }
@@ -31,6 +35,10 @@ namespace KeySkills.Core.Data
                 .Property(k => k.Pattern)
                 .IsRequired();
         }
+
+        private void SeedKeywordEntityData(ModelBuilder modelBuilder) =>
+            modelBuilder.Entity<Keyword>()
+                .HasData(new KeywordSeedData().Items.Select(i => i.Keyword));
 
         private void CreateVacancyEntity(ModelBuilder modelBuilder)
         {
