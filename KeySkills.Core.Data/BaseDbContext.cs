@@ -14,51 +14,67 @@ namespace KeySkills.Core.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Keyword 
-            modelBuilder.Entity<Keyword>()
+            CreateKeywordEntity(modelBuilder);
+            CreateVacancyEntity(modelBuilder);
+            CreateVacancyKeywordEntity(modelBuilder);
+        }
+
+        private void CreateKeywordEntity(ModelBuilder modelBuilder)
+        {
+            var keywordEntity = modelBuilder.Entity<Keyword>();
+            
+            keywordEntity
                 .Property(k => k.Name)
                 .IsRequired();
 
-            modelBuilder.Entity<Keyword>()
+            keywordEntity
                 .Property(k => k.Pattern)
                 .IsRequired();
+        }
 
-            // Vacancy
-            modelBuilder.Entity<Vacancy>()
+        private void CreateVacancyEntity(ModelBuilder modelBuilder)
+        {
+            var vacancyEntity = modelBuilder.Entity<Vacancy>();
+            
+            vacancyEntity
                 .HasIndex(v => v.Link)
                 .IsUnique();
 
-            modelBuilder.Entity<Vacancy>()
+            vacancyEntity
                 .Property(v => v.Link)
                 .IsRequired();
 
-            modelBuilder.Entity<Vacancy>()
+            vacancyEntity
                 .Property(v => v.Title)
                 .IsRequired();
 
-            modelBuilder.Entity<Vacancy>()
+            vacancyEntity
                 .Property(v => v.Description)
                 .IsRequired();
 
-            modelBuilder.Entity<Vacancy>()
+            vacancyEntity
                 .Property(v => v.PublishedAt)
                 .IsRequired();
 
-            modelBuilder.Entity<Vacancy>()
+            vacancyEntity
                 .Property(v => v.CountryCode)
                 .HasMaxLength(2)
                 .HasConversion(new EnumToStringConverter<Country>());
+        }
 
-            // VacancyKeyword
-            modelBuilder.Entity<VacancyKeyword>()
+        private void CreateVacancyKeywordEntity(ModelBuilder modelBuilder)
+        {
+            var vacancyKeywordEntity =  modelBuilder.Entity<VacancyKeyword>();
+
+            vacancyKeywordEntity
                 .HasKey(vk => new { vk.VacancyId, vk.KeywordId });
 
-            modelBuilder.Entity<VacancyKeyword>()
+            vacancyKeywordEntity
                 .HasOne(vk => vk.Vacancy)
                 .WithMany(v => v.Keywords)
                 .HasForeignKey(vk => vk.VacancyId);
 
-            modelBuilder.Entity<VacancyKeyword>()
+            vacancyKeywordEntity
                 .HasOne(vk => vk.Keyword)
                 .WithMany(k => k.Vacancies)
                 .HasForeignKey(vk => vk.KeywordId);
