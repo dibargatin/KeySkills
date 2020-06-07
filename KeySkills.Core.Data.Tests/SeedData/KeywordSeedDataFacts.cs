@@ -33,6 +33,25 @@ namespace KeySkills.Core.Data.Tests
                 expected.NegativeTests.Where(test => regex.IsMatch(test))
                     .Should().BeEmpty($"because all NEGATIVE tests should not match to {expected.Keyword.Pattern}");
             }
+
+            [Fact]
+            public void HaveUniqueIds() =>
+                new KeywordSeedData().Items
+                    .GroupBy(item => item.Keyword.KeywordId)
+                    .Where(group => group.Count() > 1)
+                    .SelectMany(group => group.Select(item => item.Keyword))
+                    .Should().BeEmpty("because keywords ids should be unique");
+
+            [Fact]
+            public void NotHaveGapsInIds() =>                
+                new KeywordSeedData().Items
+                    .Zip(new KeywordSeedData().Items.Skip(1))
+                    .Where(pair => pair.Second.Keyword.KeywordId - pair.First.Keyword.KeywordId != 1)
+                    .SelectMany(pair => new[] { 
+                        pair.First.Keyword,
+                        pair.Second.Keyword
+                    }).Take(2)
+                    .Should().BeEmpty("because keywords ids should grow monotonically");                    
         }
     }
 }
