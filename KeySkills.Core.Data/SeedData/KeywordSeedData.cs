@@ -7,6 +7,11 @@ namespace KeySkills.Core.Data.SeedData
 {
     public class KeywordSeedData
     {
+        /// <summary>
+        /// Max seed data identifier
+        /// </summary>
+        public static int MaxId => 100000;
+
         public class Item
         {
             public Keyword Keyword { get; set; }

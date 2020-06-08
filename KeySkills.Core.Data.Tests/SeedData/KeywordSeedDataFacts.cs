@@ -35,6 +35,12 @@ namespace KeySkills.Core.Data.Tests
             }
 
             [Fact]
+            public void HaveIdsNotGreaterThanMaxId() =>
+                new KeywordSeedData().Items
+                    .Where(item => item.Keyword.KeywordId > KeywordSeedData.MaxId)
+                    .Should().BeEmpty($"because keywords ids should not be greater than {KeywordSeedData.MaxId}");
+
+            [Fact]
             public void HaveUniqueIds() =>
                 new KeywordSeedData().Items
                     .GroupBy(item => item.Keyword.KeywordId)
