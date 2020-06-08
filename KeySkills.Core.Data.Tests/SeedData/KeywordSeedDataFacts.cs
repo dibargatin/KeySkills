@@ -51,7 +51,15 @@ namespace KeySkills.Core.Data.Tests
                         pair.First.Keyword,
                         pair.Second.Keyword
                     }).Take(2)
-                    .Should().BeEmpty("because keywords ids should grow monotonically");                    
+                    .Should().BeEmpty("because keywords ids should grow monotonically");      
+
+            [Fact]
+            public void HaveUniqueNames() =>
+                new KeywordSeedData().Items
+                    .GroupBy(item => item.Keyword.Name)
+                    .Where(group => group.Count() > 1)
+                    .SelectMany(group => group.Select(item => item.Keyword))
+                    .Should().BeEmpty("because keywords names should be unique");
         }
     }
 }
