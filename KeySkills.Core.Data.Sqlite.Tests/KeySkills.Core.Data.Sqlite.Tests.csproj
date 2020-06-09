@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="fluentassertions" Version="5.10.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -16,7 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KeySkills.Core.Data\KeySkills.Core.Data.csproj" />
+    <ProjectReference Include="..\KeySkills.Core.Data.Sqlite\KeySkills.Core.Data.Sqlite.csproj" />
+    <ProjectReference Include="..\KeySkills.Core.Data.Tests\KeySkills.Core.Data.Tests.csproj" />
   </ItemGroup>
 
 </Project>
