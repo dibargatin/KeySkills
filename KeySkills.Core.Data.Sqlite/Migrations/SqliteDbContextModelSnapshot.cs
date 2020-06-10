@@ -24,7 +24,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT COLLATE NOCASE");
 
                     b.Property<string>("Pattern")
                         .IsRequired()

@@ -13,7 +13,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
                 {
                     KeywordId = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(type: "TEXT COLLATE NOCASE", nullable: false),
                     Pattern = table.Column<string>(nullable: false)
                 },
                 constraints: table =>

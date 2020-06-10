@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KeySkills.Core.Data.Sqlite.Migrations
 {
     [DbContext(typeof(SqliteDbContext))]
-    [Migration("20200609193022_Initial")]
+    [Migration("20200610200355_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT COLLATE NOCASE");
 
                     b.Property<string>("Pattern")
                         .IsRequired()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace KeySkills.Core.Repositories
@@ -21,7 +22,7 @@ namespace KeySkills.Core.Repositories
         /// </summary>
         /// <param name="predicate">Predicate to filter entities</param>
         /// <returns>Entities collection</returns>
-        Task<IEnumerable<T>> GetAsync(Func<T, bool> predicate);
+        Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate);
 
         /// <summary>
         /// Adds entity

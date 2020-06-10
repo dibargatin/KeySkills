@@ -12,16 +12,17 @@ namespace KeySkills.Core.Data.Tests
     {
         [Fact]
         public async void GetAllAsync_ShouldReturnAllSeedData()
-        {
+        {   
             using var context = _fixture.CreateContext();
             var repository = new KeywordRepository(context);
-
-            (await repository.GetAllAsync())
+            
+            var expected = new KeywordSeedData().Items.Select(item => item.Keyword);
+            var keywords = await repository.GetAllAsync();
+            
+            keywords
                 .Should().NotBeEmpty()
-                .And.HaveCount(new KeywordSeedData().Items.Count());
-                /* .And.Contain(
-                    new KeywordSeedData().Items.Select(item => item.Keyword)
-                ); */
+                .And.HaveCount(expected.Count())
+                .And.BeEquivalentTo(expected);
         }
     }
 }

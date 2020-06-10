@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using KeySkills.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -39,8 +40,8 @@ namespace KeySkills.Core.Data.Repositories
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync() =>
             await _context.Set<TEntity>().ToListAsync();
 
-        public virtual async Task<IEnumerable<TEntity>> GetAsync(Func<TEntity, bool> predicate) =>
-            await _context.Set<TEntity>().Where(e => predicate(e)).ToListAsync();
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> predicate) =>
+            await _context.Set<TEntity>().Where(predicate).ToListAsync();
 
         public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {

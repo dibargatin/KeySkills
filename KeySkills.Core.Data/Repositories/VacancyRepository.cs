@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using KeySkills.Core.Models;
 using KeySkills.Core.Repositories;
@@ -20,7 +21,7 @@ namespace KeySkills.Core.Data.Repositories
         public override async Task<IEnumerable<Vacancy>> GetAllAsync() =>
             await GetVacancies().ToListAsync();
 
-        public override async Task<IEnumerable<Vacancy>> GetAsync(Func<Vacancy, bool> predicate) =>
-            await GetVacancies().Where(e => predicate(e)).ToListAsync();
+        public override async Task<IEnumerable<Vacancy>> GetAsync(Expression<Func<Vacancy, bool>> predicate) =>
+            await GetVacancies().Where(predicate).ToListAsync();
     }
 }
