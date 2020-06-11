@@ -32,8 +32,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
 
                     b.HasKey("KeywordId");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.ToTable("Keywords");
 

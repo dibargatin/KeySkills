@@ -650,8 +650,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Keywords_Name",
                 table: "Keywords",
-                column: "Name",
-                unique: true);
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vacancies_Link",

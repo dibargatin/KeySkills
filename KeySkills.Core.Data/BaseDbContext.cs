@@ -28,8 +28,7 @@ namespace KeySkills.Core.Data
             var keywordEntity = modelBuilder.Entity<Keyword>();
             
             keywordEntity
-                .HasIndex(k => k.Name)
-                .IsUnique();
+                .HasIndex(k => k.Name);
 
             keywordEntity
                 .Property(k => k.Name)

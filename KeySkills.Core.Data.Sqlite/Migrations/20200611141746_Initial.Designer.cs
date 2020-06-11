@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KeySkills.Core.Data.Sqlite.Migrations
 {
     [DbContext(typeof(SqliteDbContext))]
-    [Migration("20200610200355_Initial")]
+    [Migration("20200611141746_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,8 +34,7 @@ namespace KeySkills.Core.Data.Sqlite.Migrations
 
                     b.HasKey("KeywordId");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.ToTable("Keywords");
 
