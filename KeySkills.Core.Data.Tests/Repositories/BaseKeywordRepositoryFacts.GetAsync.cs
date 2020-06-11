@@ -38,5 +38,32 @@ namespace KeySkills.Core.Data.Tests
                 .And.HaveCount(expected.Count())
                 .And.BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async void GetAsync_ShouldTreatNameAsCaseInsensitiveText()
+        {
+            using var context = _fixture.CreateContext();
+            var repository = new KeywordRepository(context);
+
+            var keywords = await repository.GetAsync(
+                keyword => keyword.Name == ".net"
+            );
+
+            keywords
+                .Should().NotBeEmpty()
+                .And.HaveCount(1)
+                .And.OnlyContain(keyword => keyword.Name == ".NET");
+        }
+
+        [Fact]
+        public async void GetAsync_ShouldReturnEmptyCollectionWhenPredicateIsFalse()
+        {
+            using var context = _fixture.CreateContext();
+            var repository = new KeywordRepository(context);
+
+            var keywords = await repository.GetAsync(_ => false);
+
+            keywords.Should().BeEmpty();
+        }
     }
 }
