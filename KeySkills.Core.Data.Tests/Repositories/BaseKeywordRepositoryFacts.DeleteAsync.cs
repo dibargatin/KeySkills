@@ -33,6 +33,10 @@ namespace KeySkills.Core.Data.Tests
                     var keywords = await repository.GetAsync(k => k.KeywordId == entity.KeywordId);
 
                     keywords.Should().BeEmpty();
+
+                    context.VacancyKeywords
+                        .Where(vk => vk.KeywordId == entity.KeywordId)
+                        .Should().BeEmpty();
                 }
             }
         }
