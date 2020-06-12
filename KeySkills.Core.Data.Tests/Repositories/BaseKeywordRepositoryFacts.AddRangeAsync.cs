@@ -31,13 +31,18 @@ namespace KeySkills.Core.Data.Tests
 
         [Theory]
         [MemberData(nameof(InvalidKeywordsCollectionsData))]
-        public void AddRangeAsync_ShouldNotAddInvalidKeywords(IEnumerable<Keyword> entities)
+        public async void AddRangeAsync_ShouldNotAddInvalidKeywords(IEnumerable<Keyword> entities)
         {
             using var context = _fixture.CreateContext();
             var repository = new KeywordRepository(context);
             
             this.Invoking(async _ => await repository.AddRangeAsync(entities))
                 .Should().Throw<Exception>();
+
+            var keywords = await repository.GetAllAsync();
+
+            keywords.Where(k => entities.Contains(k))
+                .Should().BeEmpty();
         }
 
         [Fact]

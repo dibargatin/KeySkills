@@ -40,13 +40,17 @@ namespace KeySkills.Core.Data.Tests
         
         [Theory]
         [MemberData(nameof(InvalidKeywordsTheoryData))]
-        public void AddAsync_ShouldNotAddInvalidKeyword(Keyword entity)
+        public async void AddAsync_ShouldNotAddInvalidKeyword(Keyword entity)
         {
             using var context = _fixture.CreateContext();
             var repository = new KeywordRepository(context);
             
             this.Invoking(async _ => await repository.AddAsync(entity))
                 .Should().Throw<Exception>();
+
+            var keywords = await repository.GetAsync(k => k.KeywordId == entity.KeywordId);
+
+            keywords.Should().BeEmpty();
         }
 
         public static Keyword[] ValidKeywords => new[] {
