@@ -41,7 +41,7 @@ namespace KeySkills.Core.Data.Tests
 
             var keywords = await repository.GetAllAsync();
 
-            keywords.Where(k => entities.Contains(k))
+            keywords.Where(k => entities.Any(e => e.KeywordId == k.KeywordId))
                 .Should().BeEmpty();
         }
 
