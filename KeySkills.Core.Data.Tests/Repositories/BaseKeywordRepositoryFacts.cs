@@ -21,15 +21,5 @@ namespace KeySkills.Core.Data.Tests
         /// <exception cref="ArgumentNullException"><paramref name="fixture"/> is <see langword="null" /></exception>
         public BaseKeywordRepositoryFacts(TFixture fixture) =>
             _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
-        
-
-        /// <summary>
-        /// Contains integration tests of <see cref="KeywordRepository.UpdateAsync"/>
-        /// </summary>
-        
-
-        /// <summary>
-        /// Contains integration tests of <see cref="KeywordRepository.DeleteAsync"/>
-        /// </summary>
     }
 }
