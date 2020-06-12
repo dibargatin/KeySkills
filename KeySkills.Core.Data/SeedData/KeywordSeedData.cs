@@ -5,6 +5,9 @@ using KeySkills.Core.Models;
 
 namespace KeySkills.Core.Data.SeedData
 {
+    /// <summary>
+    /// Contains keyword seed data
+    /// </summary>
     public class KeywordSeedData
     {
         /// <summary>
@@ -12,10 +15,24 @@ namespace KeySkills.Core.Data.SeedData
         /// </summary>
         public static int MaxId => 100000;
 
+        /// <summary>
+        /// Represents keyword seed data item
+        /// </summary>
         public class Item
         {
+            /// <summary>
+            /// Keyword
+            /// </summary>
             public Keyword Keyword { get; set; }
+
+            /// <summary>
+            /// Positive tests of keyword regex pattern
+            /// </summary>
             public IEnumerable<string> PositiveTests { get; set; }
+
+            /// <summary>
+            /// Negative tests of keyword regex pattern
+            /// </summary>
             public IEnumerable<string> NegativeTests { get; set; }
         }
 
@@ -68,6 +85,9 @@ namespace KeySkills.Core.Data.SeedData
                 tests: new[] { name }
             );
 
+        /// <summary>
+        /// Keyword seed data items
+        /// </summary>
         public IEnumerable<Item> Items => new[] {
             Keyword(1, ".NET", 
                 pattern: @"\.net|dot\p{Z}*net", 

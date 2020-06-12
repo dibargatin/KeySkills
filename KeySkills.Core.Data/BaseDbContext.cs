@@ -6,12 +6,31 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KeySkills.Core.Data
 {
+    /// <summary>
+    /// Represents abstract DbContext
+    /// </summary>
     public abstract class BaseDbContext : DbContext
     {
+        /// <summary>
+        /// Initializes context
+        /// </summary>
+        /// <param name="options">Context options</param>
         public BaseDbContext(DbContextOptions options) : base(options) {}
 
+        /// <summary>
+        /// Vacansies collection
+        /// </summary>
         public DbSet<Vacancy> Vacancies { get; set; }
+
+        /// <summary>
+        /// Keywords collection
+        /// </summary>
         public DbSet<Keyword> Keywords { get; set; }
+
+        /// <summary>
+        /// Represents many-to-many relationship between vacancies and keywords
+        /// </summary>
+        /// <value></value>
         public DbSet<VacancyKeyword> VacancyKeywords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

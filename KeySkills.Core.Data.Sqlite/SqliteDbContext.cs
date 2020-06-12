@@ -3,8 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KeySkills.Core.Data.Sqlite
 {
+    /// <summary>
+    /// Represents SQLite DbContext
+    /// </summary>
     public class SqliteDbContext : BaseDbContext
     {
+        /// <inheritdoc/>
         public SqliteDbContext(DbContextOptions<SqliteDbContext> options) : base(options) {}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
