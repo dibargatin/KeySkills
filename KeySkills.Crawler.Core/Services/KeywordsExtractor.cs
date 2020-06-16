@@ -10,7 +10,7 @@ namespace KeySkills.Crawler.Core.Services
     /// <summary>
     /// Implements <see cref="IKeywordsExtractor"/>
     /// </summary>
-    public class KeywordExtractor : IKeywordsExtractor
+    public class KeywordsExtractor : IKeywordsExtractor
     {
         private readonly IEnumerable<(Keyword keyword, Regex regex)> _keywords;
         
@@ -18,7 +18,7 @@ namespace KeySkills.Crawler.Core.Services
         /// Initializes instance of keyword extractor
         /// </summary>
         /// <param name="keywords">Collection of the keywords to be extracted</param>
-        public KeywordExtractor(IEnumerable<Keyword> keywords) =>
+        public KeywordsExtractor(IEnumerable<Keyword> keywords) =>
             _keywords = keywords.Select(keyword => (
                 keyword, 
                 new Regex(keyword.Pattern, 

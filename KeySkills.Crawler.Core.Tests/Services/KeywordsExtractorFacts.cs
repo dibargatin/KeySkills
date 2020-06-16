@@ -9,7 +9,7 @@ using Xunit;
 
 namespace KeySkills.Crawler.Core.Tests
 {
-    public class KeywordExtractorFacts
+    public class KeywordsExtractorFacts
     {
         public class Extract_Should
         {
@@ -24,7 +24,7 @@ namespace KeySkills.Crawler.Core.Tests
                 }
             };
 
-            private static KeywordExtractor _extractor = new KeywordExtractor(_keywords);
+            private static KeywordsExtractor _extractor = new KeywordsExtractor(_keywords);
 
             private static T[] Single<T>(T value) => new[] { value };
 
