@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using KeySkills.Core.Models;
@@ -24,7 +26,7 @@ namespace KeySkills.Crawler.Core.Clients
         /// <summary>
         /// Predicate for filtering already downloaded vacancies by URL
         /// </summary>
-        protected readonly Func<string, bool> _isVacancyExisted;
+        protected readonly Func<string, Task<bool>> _isVacancyExisted;
 
         /// <summary>
         /// IKeywordsExtractor to extract keywords from vacancies
@@ -40,7 +42,7 @@ namespace KeySkills.Crawler.Core.Clients
         /// <exception cref="ArgumentNullException"><paramref name="http"/> is <see langword="null" /></exception>
         /// <exception cref="ArgumentNullException"><paramref name="isVacancyExisted"/> is <see langword="null" /></exception>
         /// <exception cref="ArgumentNullException"><paramref name="keywordsExtractor"/> is <see langword="null" /></exception>
-        public BaseJobBoardClient(HttpClient http, Func<string, bool> isVacancyExisted, IKeywordsExtractor keywordsExtractor)
+        public BaseJobBoardClient(HttpClient http, Func<string, Task<bool>> isVacancyExisted, IKeywordsExtractor keywordsExtractor)
         {
             _http = http ?? throw new ArgumentNullException(nameof(http));
             _isVacancyExisted = isVacancyExisted ?? throw new ArgumentNullException(nameof(isVacancyExisted));
@@ -63,7 +65,7 @@ namespace KeySkills.Crawler.Core.Clients
                         KeywordId = keyword.KeywordId,
                         Keyword = keyword
                     })
-            );
+                ).ToList();
             return vacancy;
         }
 
@@ -118,16 +120,45 @@ namespace KeySkills.Crawler.Core.Clients
             /// </summary>
             public sealed class Json : Deserializer
             {
-                private static readonly Lazy<Json> _instance = new Lazy<Json>(() => new Json());
+                public class DateTimeConverter : JsonConverter<DateTime>
+                {
+                    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+                    {
+                        if (!reader.TryGetDateTime(out DateTime value))
+                        {
+                            value = DateTime.Parse(reader.GetString());
+                        }
+
+                        return value.ToUniversalTime();
+                    }
+
+                    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+                    {
+                        writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"));
+                    }
+                }
+
+                private static readonly Lazy<Json> _instance = new Lazy<Json>(() => {
+                    var options = new JsonSerializerOptions();
+                    
+                    options.Converters.Add(new DateTimeConverter());
+
+                    return new Json(options);
+                });
 
                 /// <summary>
                 /// Singleton default instance of JSON deserializer
                 /// </summary>
                 public static Json Default => _instance.Value;
 
+                private readonly JsonSerializerOptions _options;
+
+                public Json(JsonSerializerOptions options = null) =>
+                    _options = options;
+
                 /// <inheritdoc/>
                 public override Task<T> Deserialize<T>(Stream stream) =>
-                    JsonSerializer.DeserializeAsync<T>(stream).AsTask();
+                    JsonSerializer.DeserializeAsync<T>(stream, _options).AsTask();
             }
         }
     }

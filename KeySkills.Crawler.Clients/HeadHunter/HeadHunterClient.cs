@@ -34,7 +34,7 @@ namespace KeySkills.Crawler.Clients.HeadHunter
         public HeadHunterClient(
             HttpClient http, 
             IRequestFactory requestFactory, 
-            Func<string, bool> isVacancyExisted,
+            Func<string, Task<bool>> isVacancyExisted,
             IKeywordsExtractor keywordsExtractor
         ) : base(http, isVacancyExisted, keywordsExtractor) =>
             _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
@@ -42,9 +42,10 @@ namespace KeySkills.Crawler.Clients.HeadHunter
         /// <inheritdoc/>
         public override IObservable<Vacancy> GetVacancies() =>
             GetItems()
-                .Where(item => !_isVacancyExisted(item.AlternateUrl))
+                .Where(item => _isVacancyExisted(item.AlternateUrl), false)
                 .SelectMany(item => Observable.FromAsync(async () => await GetJobDetails(item.Url)))
                 .SelectMany(job => Observable.FromAsync(async () => await job.GetVacancy(GetAreaInfo)))
+                .Distinct(vacancy => vacancy.Link)
                 .Select(vacancy => ExtractKeywords(vacancy));
 
         private Task<Root> GetNextRoot(int page) =>

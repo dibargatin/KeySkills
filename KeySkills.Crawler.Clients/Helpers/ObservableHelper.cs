@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace KeySkills.Crawler.Clients.Helpers
 {
-    public class ObservableHelper
+    public static class ObservableHelper
     {
         /// <summary>
         /// Executes asynchronous functions while the condition is true
@@ -42,5 +42,25 @@ namespace KeySkills.Crawler.Clients.Helpers
                         }
                     }));
         }
+
+        /// <summary>
+        /// Filter out observable items
+        /// </summary>
+        /// <param name="source">Observable sequence</param>
+        /// <param name="predicate">Predicate for filtering</param>
+        /// <param name="value">Expected value of the predicate</param>
+        /// <typeparam name="T">Type of observable item</typeparam>
+        /// <returns>Filtered observable sequence</returns>
+        public static IObservable<T> Where<T>(
+            this IObservable<T> source, 
+            Func<T, Task<bool>> predicate, 
+            bool value = true
+        ) =>
+            source.SelectMany(async item => new {
+                ShouldInclude = await predicate(item) == value,
+                Item = item
+            })
+            .Where(x => x.ShouldInclude)
+            .Select(x => x.Item);        
     }
 }

@@ -61,9 +61,9 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 public string Industry { get; set; }  
 
                 /// <summary>
-                /// Known API limitation
+                /// Known API limit
                 /// </summary>
-                public static int MaxItemsPerPage = 100;
+                public static int MaxItemsPerPage => 100;
 
                 private string GetParam(string name, string value, bool isLast = false) =>
                     value != null ? 
@@ -100,18 +100,27 @@ namespace KeySkills.Crawler.Clients.HeadHunter
             /// </summary>
             public string AreaUrl { get; set; }
 
+            private HttpRequestMessage CreateRequest(Uri uri)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+                request.Headers.Add("User-Agent", ".NET");
+                request.Headers.Host = uri.Host;
+
+                return request;
+            }
+
             /// <inheritdoc/>
             public HttpRequestMessage CreateRootRequest(int page) =>
-                new HttpRequestMessage(HttpMethod.Get, 
-                    new Uri(BaseUri, RootParams.GetQueryString(page)));
+                CreateRequest(new Uri(BaseUri, RootParams.GetQueryString(page)));
 
             /// <inheritdoc/>
             public HttpRequestMessage CreateJobDetailsRequest(string url) =>
-                new HttpRequestMessage(HttpMethod.Get, url);
+                CreateRequest(new Uri(url));
 
             /// <inheritdoc/>
             public HttpRequestMessage CreateAreaRequest(string id) =>
-                new HttpRequestMessage(HttpMethod.Get, 
+                CreateRequest( 
                     new Uri(BaseUri, AreaUrl != null ?
                         String.Concat(Uri.EscapeUriString(AreaUrl), "/", Uri.EscapeDataString(id ?? String.Empty)) :
                         Uri.EscapeDataString(id ?? String.Empty)));

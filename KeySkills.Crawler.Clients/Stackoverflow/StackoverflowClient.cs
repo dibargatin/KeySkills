@@ -6,6 +6,8 @@ using System.Linq;
 using KeySkills.Core.Models;
 using KeySkills.Crawler.Core.Services;
 using KeySkills.Crawler.Core.Clients;
+using KeySkills.Crawler.Clients.Helpers;
+using System.Threading.Tasks;
 
 namespace KeySkills.Crawler.Clients.Stackoverflow
 {
@@ -33,7 +35,7 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
         public StackoverflowClient(
             HttpClient http, 
             IRequestFactory requestFactory,
-            Func<string, bool> isVacancyExisted,
+            Func<string, Task<bool>> isVacancyExisted,
             IKeywordsExtractor keywordsExtractor
         ) : base(http, isVacancyExisted, keywordsExtractor) =>
             _requestFactory = requestFactory ?? throw new ArgumentNullException(nameof(requestFactory));
@@ -46,7 +48,7 @@ namespace KeySkills.Crawler.Clients.Stackoverflow
             ).ToObservable()
             .SelectMany(list => list.Posts)
             .Select(job => job.GetVacancy())
-            .Where(vacancy => !_isVacancyExisted(vacancy.Link))
+            .Where(vacancy => _isVacancyExisted(vacancy.Link), false)
             .Select(vacancy => ExtractKeywords(vacancy));
     }
 }

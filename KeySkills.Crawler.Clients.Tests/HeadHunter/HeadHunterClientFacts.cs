@@ -246,7 +246,7 @@ namespace KeySkills.Crawler.Clients.Tests
                 new HeadHunterClient(
                     new HttpClient(handler),
                     _requestFactory,
-                    _ => isVacancyExisted,
+                    _ => Task.FromResult(isVacancyExisted),
                     keywordsExtractor ?? GetKeywordsExtractorMock().Object
                 );
 
