@@ -21,11 +21,31 @@ namespace KeySkills.Core.Data.Repositories
         /// <exception cref="ArgumentNullException"><paramref name="context"/> is <see langword="null"/></exception>
         public VacancyRepository(BaseDbContext context) : base(context) {}
 
+        private void AttachKeywords(IEnumerable<VacancyKeyword> vacancyKeywords) =>
+            _context.Keywords.AttachRange(
+                vacancyKeywords.Select(
+                    vk => vk.Keyword ?? new Keyword { KeywordId = vk.KeywordId }
+                ));
+
+        /// <inheritdoc/>
+        public override Task<Vacancy> AddAsync(Vacancy entity) 
+        {
+            AttachKeywords(entity.Keywords);
+            return base.AddAsync(entity);
+        }
+
+        /// <inheritdoc/>
+        public override Task<IEnumerable<Vacancy>> AddRangeAsync(IEnumerable<Vacancy> entities)
+        {
+            AttachKeywords(entities.SelectMany(entity => entity.Keywords));
+            return base.AddRangeAsync(entities);
+        }
+        
         private IQueryable<Vacancy> GetVacancies() =>
             _context.Set<Vacancy>()
                 .Include(v => v.Keywords)
                 .ThenInclude(vk => vk.Keyword);
-        
+
         /// <inheritdoc/>
         public override async Task<IEnumerable<Vacancy>> GetAllAsync() =>
             await GetVacancies().ToListAsync();

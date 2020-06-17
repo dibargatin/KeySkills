@@ -98,7 +98,7 @@ namespace KeySkills.Core.Data.Tests
 
         [Theory]
         [MemberData(nameof(ValidVacanciesTheoryData))]
-        public async void AddAsync_ShouldAddValidKeyword(Vacancy entity)
+        public async void AddAsync_ShouldAddValidVacancy(Vacancy entity)
         {
             using (var transaction = _fixture.Connection.BeginTransaction())
             {
