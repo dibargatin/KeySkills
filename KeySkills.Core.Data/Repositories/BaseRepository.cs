@@ -65,5 +65,9 @@ namespace KeySkills.Core.Data.Repositories
             await _context.SaveChangesAsync();
             return entity;
         }
+
+        /// <inheritdoc/>
+        public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate) =>
+            _context.Set<TEntity>().AnyAsync(predicate);
     }
 }

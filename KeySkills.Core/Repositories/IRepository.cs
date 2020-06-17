@@ -47,5 +47,12 @@ namespace KeySkills.Core.Repositories
         /// </summary>
         /// <param name="entity">Entity to delete</param>
         Task DeleteAsync(T entity);
+        
+        /// <summary>
+        /// Checks whether any entity matched to predicate exist or not
+        /// </summary>
+        /// <param name="predicate">Predicate to filter entities</param>
+        /// <returns><see langword="true"/> if any entity exists or <see langword="false"/> otherwise</returns>
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
     }
 }
