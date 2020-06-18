@@ -63,7 +63,12 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                 /// <summary>
                 /// Known API limit
                 /// </summary>
-                public static int MaxItemsPerPage => 100;
+                public static int MaxItemsCount => 2000;
+
+                /// <summary>
+                /// Items per page
+                /// </summary>
+                public static int ItemsPerPage => 10;
 
                 private string GetParam(string name, string value, bool isLast = false) =>
                     value != null ? 
@@ -80,7 +85,7 @@ namespace KeySkills.Crawler.Clients.HeadHunter
                         .Append(Url == null ? String.Empty : Uri.EscapeUriString(Url)).Append("?")
                         .Append(GetParam("text", Text))
                         .Append(GetParam("industry", Industry))
-                        .Append(GetParam("per_page", MaxItemsPerPage.ToString()))
+                        .Append(GetParam("per_page", ItemsPerPage.ToString()))
                         .Append(GetParam("page", page.ToString(), isLast: true))
                         .ToString();
             }
@@ -112,7 +117,9 @@ namespace KeySkills.Crawler.Clients.HeadHunter
 
             /// <inheritdoc/>
             public HttpRequestMessage CreateRootRequest(int page) =>
-                CreateRequest(new Uri(BaseUri, RootParams.GetQueryString(page)));
+                page * RootRequestParams.ItemsPerPage < RootRequestParams.MaxItemsCount ?
+                    CreateRequest(new Uri(BaseUri, RootParams.GetQueryString(page))) :
+                    null;
 
             /// <inheritdoc/>
             public HttpRequestMessage CreateJobDetailsRequest(string url) =>

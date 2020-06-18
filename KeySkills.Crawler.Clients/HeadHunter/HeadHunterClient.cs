@@ -43,24 +43,25 @@ namespace KeySkills.Crawler.Clients.HeadHunter
         public override IObservable<Vacancy> GetVacancies() =>
             GetItems()
                 .Where(item => _isVacancyExisted(item.AlternateUrl), false)
+                .Distinct(item => item.AlternateUrl)
                 .SelectMany(item => Observable.FromAsync(async () => await GetJobDetails(item.Url)))
                 .SelectMany(job => Observable.FromAsync(async () => await job.GetVacancy(GetAreaInfo)))
-                .Distinct(vacancy => vacancy.Link)
                 .Select(vacancy => ExtractKeywords(vacancy));
 
         private Task<Root> GetNextRoot(int page) =>
-            ExecuteRequest<Root>(
-                _requestFactory.CreateRootRequest(page),
-                Deserializer.Json.Default
-            );
+            _requestFactory.CreateRootRequest(page) switch {
+                null => Task.FromResult(default(Root)),
+                var request => ExecuteRequest<Root>(request, Deserializer.Json.Default)
+            };
         
         private IObservable<Item> GetItems() => 
             ObservableHelper.GenerateFromAsync(
                 () => GetNextRoot(1),
-                prev => prev.CurrentPage < prev.PagesCount,
+                prev => prev != null && prev.CurrentPage < prev.PagesCount,
                 prev => GetNextRoot(prev.CurrentPage + 1),
                 result => result
-            ).SelectMany(root => root.Items);
+            ).Where(root => root != null)
+            .SelectMany(root => root.Items);
 
         private Task<JobPost> GetJobDetails(string url) =>
             ExecuteRequest<JobPost>(

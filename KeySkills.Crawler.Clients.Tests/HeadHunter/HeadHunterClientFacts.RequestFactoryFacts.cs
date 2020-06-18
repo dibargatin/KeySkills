@@ -23,7 +23,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 RootParams = new RootRequestParams()
                             },
                             1,
-                            new Uri(_baseUri, $"?per_page={RootRequestParams.MaxItemsPerPage}&page=1")
+                            new Uri(_baseUri, $"?per_page={RootRequestParams.ItemsPerPage}&page=1")
                         }
                     };
 
@@ -39,7 +39,17 @@ namespace KeySkills.Crawler.Clients.Tests
                         BaseUri = _baseUri,
                         RootParams = new RootRequestParams()
                     }.CreateRootRequest(1)
-                    .Method.Should().Be(HttpMethod.Get);                    
+                    .Method.Should().Be(HttpMethod.Get);  
+
+                [Fact]
+                public void ReturnNullWhenThereIsMaxItemsCountOnRequestedPage()
+                {
+                    new RequestFactory {
+                        BaseUri = _baseUri,
+                        RootParams = new RootRequestParams()
+                    }.CreateRootRequest(RootRequestParams.MaxItemsCount / RootRequestParams.ItemsPerPage)
+                    .Should().BeNull();
+                }
             }
 
             public class CreateJobDetailsRequest_Should : RequestFactoryFacts
@@ -95,7 +105,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 new RootRequestParams(), 
                                 1, 
                                 $@"?per_page={
-                                    RootRequestParams.MaxItemsPerPage
+                                    RootRequestParams.ItemsPerPage
                                 }&page=1"
                             },
                             { 
@@ -104,7 +114,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 }, 
                                 10, 
                                 $@"?per_page={
-                                    RootRequestParams.MaxItemsPerPage
+                                    RootRequestParams.ItemsPerPage
                                 }&page=10"
                             },
                             { 
@@ -113,7 +123,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 }, 
                                 20, 
                                 $@"/vacancies?per_page={
-                                    RootRequestParams.MaxItemsPerPage
+                                    RootRequestParams.ItemsPerPage
                                 }&page=20"
                             },
                             { 
@@ -123,7 +133,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 }, 
                                 30, 
                                 $@"/jobs?text=developer&per_page={
-                                    RootRequestParams.MaxItemsPerPage
+                                    RootRequestParams.ItemsPerPage
                                 }&page=30"
                             },
                             { 
@@ -134,7 +144,7 @@ namespace KeySkills.Crawler.Clients.Tests
                                 },
                                 40, 
                                 $@"/job%20list?text=software%20engineer&industry=7%205&per_page={
-                                    RootRequestParams.MaxItemsPerPage
+                                    RootRequestParams.ItemsPerPage
                                 }&page=40"
                             },
                         };

@@ -16,6 +16,7 @@ using Moq;
 using Moq.Protected;
 using Xunit;
 using static KeySkills.Crawler.Clients.HeadHunter.HeadHunterClient;
+using static KeySkills.Crawler.Clients.Tests.HeadHunterClientFacts.GetVacancies_Should.ExpectedResponse;
 
 namespace KeySkills.Crawler.Clients.Tests
 {
@@ -45,6 +46,7 @@ namespace KeySkills.Crawler.Clients.Tests
                             }""}}";
                     }
 
+                    public int PageNumber {get; set; }
                     public Response.Root Root { get; set; }
                     public IEnumerable<PageItem> PageItems { get; set; }
 
@@ -97,15 +99,17 @@ namespace KeySkills.Crawler.Clients.Tests
                 private IEnumerable<Tuple<HttpRequestMessage, Func<HttpResponseMessage>>> GetHttpMessages() => 
                     // Messages for root endpoint
                     Pages.Select(page => new Tuple<HttpRequestMessage, Func<HttpResponseMessage>>(
-                        _requestFactory.CreateRootRequest(page.Root.CurrentPage),
+                        _requestFactory.CreateRootRequest(page.PageNumber),
                         () => CreateResponse(page.GetRootJson())
                     ))
                     // Messages for job details endpoint
                     .Union(Pages.SelectMany(page => 
-                        page.PageItems.Select(item => new Tuple<HttpRequestMessage, Func<HttpResponseMessage>>(
-                            _requestFactory.CreateJobDetailsRequest(GetJobPostWebApiUrl(item.JobPost.Id)),
-                            () => CreateResponse(item.GetJobPostJson())
-                    ))));
+                        page.PageNumber * RequestFactory.RootRequestParams.ItemsPerPage < RequestFactory.RootRequestParams.MaxItemsCount ?
+                            page.PageItems.Select(item => new Tuple<HttpRequestMessage, Func<HttpResponseMessage>>(
+                                _requestFactory.CreateJobDetailsRequest(GetJobPostWebApiUrl(item.JobPost.Id)),
+                                () => CreateResponse(item.GetJobPostJson())
+                            )) : Enumerable.Empty<Tuple<HttpRequestMessage, Func<HttpResponseMessage>>>()
+                    ));
 
                 /// <summary>
                 /// Creates http messages for areas info endpoint
@@ -125,32 +129,37 @@ namespace KeySkills.Crawler.Clients.Tests
                         HttpRequestMessage expectedRequest = message.Item1;
                         Func<HttpResponseMessage> expectedResponse = message.Item2;
 
-                        httpMessageHandlerMock.Protected()
-                            .Setup<Task<HttpResponseMessage>>(
-                                "SendAsync",
-                                ItExpr.Is<HttpRequestMessage>(request => 
-                                    request.Method == expectedRequest.Method
-                                    && request.RequestUri == expectedRequest.RequestUri
-                                ),
-                                ItExpr.IsAny<CancellationToken>()
-                            ).ReturnsAsync(expectedResponse)
-                            .Verifiable();
+                        if (expectedRequest != null)
+                        {
+                            httpMessageHandlerMock.Protected()
+                                .Setup<Task<HttpResponseMessage>>(
+                                    "SendAsync",
+                                    ItExpr.Is<HttpRequestMessage>(request => 
+                                        request.Method == expectedRequest.Method
+                                        && request.RequestUri == expectedRequest.RequestUri
+                                    ),
+                                    ItExpr.IsAny<CancellationToken>()
+                                ).ReturnsAsync(expectedResponse)
+                                .Verifiable();
+                        }
                     }
 
                     return httpMessageHandlerMock;
                 }
 
                 public void VerifyHttpMessageHandlerMock(Mock<HttpMessageHandler> mock) =>
-                    GetHttpMessages().ToList().ForEach(request =>
-                        mock.Protected().Verify(
-                            "SendAsync",
-                            Times.Exactly(1), // Only single GET request is expected
-                            ItExpr.Is<HttpRequestMessage>(req =>
-                                req.Method == request.Item1.Method
-                                && req.RequestUri == request.Item1.RequestUri
-                            ),
-                            ItExpr.IsAny<CancellationToken>()
-                        ));
+                    GetHttpMessages().ToList().ForEach(request => {
+                        if (request.Item1 != null)
+                            mock.Protected().Verify(
+                                "SendAsync",
+                                Times.Exactly(1), // Only single GET request is expected
+                                ItExpr.Is<HttpRequestMessage>(req =>
+                                    req.Method == request.Item1.Method
+                                    && req.RequestUri == request.Item1.RequestUri
+                                ),
+                                ItExpr.IsAny<CancellationToken>()
+                            );
+                    });
 
                 public static ExpectedResponse Create() =>
                     new ExpectedResponse {
@@ -166,6 +175,7 @@ namespace KeySkills.Crawler.Clients.Tests
                         page.Root.PagesCount = pagesCount;
 
                     Pages = Pages.Append(new Page {
+                        PageNumber = pagesCount,
                         Root = new Response.Root {
                             Items = Enumerable.Empty<Response.Item>().ToArray(),
                             CurrentPage = pagesCount,
@@ -294,7 +304,46 @@ namespace KeySkills.Crawler.Clients.Tests
                             description: "oite",
                             name: "lkjfd"
                         ),
+                    // Last two pages with max items count
+                    LastTwoPagesWithMaxItemsCount()
                 };
+
+            private static ExpectedResponse LastTwoPagesWithMaxItemsCount()
+            {
+                var result = ExpectedResponse.Create()
+                    .AddPage().AddItem(
+                        id: (RequestFactory.RootRequestParams.MaxItemsCount - 1).ToString(),
+                        area: _areaInfo[1],
+                        description: "ghjkl",
+                        name: "sdfr"
+                    ).AddPage().AddItem(
+                        id: RequestFactory.RootRequestParams.MaxItemsCount.ToString(),
+                        area: _areaInfo[2],
+                        description: "oite",
+                        name: "lkjfd"
+                    );
+                
+                var totalPages = 
+                    RequestFactory.RootRequestParams.MaxItemsCount 
+                    / RequestFactory.RootRequestParams.ItemsPerPage;
+
+                var first = result.Pages.First();
+                
+                first.Root.PagesCount = totalPages;
+                first.Root.CurrentPage = totalPages - 1;
+
+                var last = result.Pages.Last();
+
+                last.PageNumber = totalPages;
+                last.Root.PagesCount = totalPages;
+                last.Root.CurrentPage = totalPages;
+
+                result.Vacancies = 
+                    result.Vacancies.Where(vacancy => 
+                        !last.PageItems.Any(pi => pi.JobPost.AlternateUrl == vacancy.Link));
+
+                return result;
+            }
 
             [Theory]
             [MemberData(nameof(ExpectedResponseData))]
