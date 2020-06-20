@@ -12,6 +12,7 @@ using KeySkills.Crawler.Core.Clients;
 using KeySkills.Crawler.Core.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -62,23 +63,27 @@ namespace KeySkills.Crawler.App
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddSingleton<IServiceScopeFactory<IVacancyRepository>, ServiceScopeFactory<IVacancyRepository>>();
+                    var config = hostContext.Configuration;
 
+                    // Configuring repositories
+                    services.AddSingleton<IServiceScopeFactory<IVacancyRepository>, ServiceScopeFactory<IVacancyRepository>>();                    
                     services.AddTransient<IKeywordRepository, KeywordRepository>();
                     services.AddTransient<IVacancyRepository, VacancyRepository>();
                     services.AddTransient<BaseDbContext, SqliteDbContext>(provider =>
                         new SqliteDbContext(
                             new DbContextOptionsBuilder<SqliteDbContext>()
-                                .UseSqlite(new SqliteConnection($"Filename=KeySkills.db"))
-                                .Options
+                                .UseSqlite(new SqliteConnection(
+                                    config.GetConnectionString(nameof(SqliteDbContext)))
+                                ).Options
                             )
                     );
+
+                    // Configuring clients
+                    services.AddSingleton<IServiceScopeFactory<IJobBoardClient>, ServiceScopeFactory<IJobBoardClient>>();
                     services.AddScoped<Func<string, Task<bool>>>(provider =>
                         vacancyUrl => provider.GetRequiredService<IVacancyRepository>()
                             .AnyAsync(v => v.Link == vacancyUrl)
                     );
-
-                    services.AddSingleton<IServiceScopeFactory<IJobBoardClient>, ServiceScopeFactory<IJobBoardClient>>();
                     services.AddScoped<IKeywordsExtractor, KeywordsExtractor>(provider => 
                         new KeywordsExtractor(
                             provider.GetRequiredService<IKeywordRepository>()
@@ -86,9 +91,35 @@ namespace KeySkills.Crawler.App
                         )
                     );
                     
-                    AddStackoverflowClient(services);
-                    AddHeadHunterClient(services);
+                    // Configuring Stackoverflow client
+                    services.AddHttpClient<IJobBoardClient, StackoverflowClient>()
+                        .AddPolicyHandler(GetCircuitBreakerPolicy())                
+                        .AddPolicyHandler(GetRetryPolicy());
+                    services.AddSingleton<StackoverflowClient.IRequestFactory>(provider =>
+                        new StackoverflowClient.RequestFactory {
+                            EndpointUri = new Uri(config["StackoverflowClient:EndpointUri"])
+                        }
+                    );
 
+                    // Configuring HeadHunter client
+                    services.AddHttpClient<IJobBoardClient, HeadHunterClient>()
+                        .AddPolicyHandler(GetCircuitBreakerPolicy())
+                        .AddPolicyHandler(GetRetryForTooManyRequestsPolicy())
+                        .AddPolicyHandler(GetRetryPolicy());
+                    services.AddSingleton<HeadHunterClient.IRequestFactory>(provider =>
+                        new HeadHunterClient.RequestFactory {
+                            BaseUri = new Uri(config["HeadHunterClient:BaseUri"]),
+                            AreaUrl = config["HeadHunterClient:AreaUrl"],
+                            RootParams = new HeadHunterClient.RequestFactory.RootRequestParams {
+                                Url = config["HeadHunterClient:RootParams:Url"],
+                                Industry = config["HeadHunterClient:RootParams:Industry"],
+                                Text = config["HeadHunterClient:RootParams:Text"]
+                            }
+                        }
+                    );
+
+                    // Configuring worker                    
+                    services.Configure<Worker.WorkerOptions>(config.GetSection("WorkerOptions"));
                     services.AddHostedService<Worker>();
                 })
                 .ConfigureLogging(logging =>
@@ -97,39 +128,6 @@ namespace KeySkills.Crawler.App
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
                 .UseNLog();
-
-        private static void AddStackoverflowClient(IServiceCollection services)
-        {
-            services.AddHttpClient<IJobBoardClient, StackoverflowClient>()
-                .AddPolicyHandler(GetCircuitBreakerPolicy())                
-                .AddPolicyHandler(GetRetryPolicy());
-
-            services.AddSingleton<StackoverflowClient.IRequestFactory>(provider =>
-                new StackoverflowClient.RequestFactory {
-                    EndpointUri = new Uri("https://stackoverflow.com/jobs/feed")
-                }
-            );
-        }
-
-        private static void AddHeadHunterClient(IServiceCollection services)
-        {
-            services.AddHttpClient<IJobBoardClient, HeadHunterClient>()
-                .AddPolicyHandler(GetCircuitBreakerPolicy())
-                .AddPolicyHandler(GetRetryForTooManyRequestsPolicy())
-                .AddPolicyHandler(GetRetryPolicy());
-
-            services.AddSingleton<HeadHunterClient.IRequestFactory>(provider =>
-                new HeadHunterClient.RequestFactory {
-                    BaseUri = new Uri("https://api.hh.ru"),
-                    AreaUrl = "/areas",
-                    RootParams = new HeadHunterClient.RequestFactory.RootRequestParams {
-                        Url = "/vacancies",
-                        Industry = "7",
-                        Text = "software OR engineer OR developer OR разработчик OR программист"
-                    }
-                }
-            );
-        }
 
         private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() =>
             HttpPolicyExtensions

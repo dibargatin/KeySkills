@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -9,20 +8,31 @@ using KeySkills.Crawler.App.Services;
 using KeySkills.Crawler.Core.Clients;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace KeySkills.Crawler.App
-{
+{   
     public class Worker : BackgroundService
-    {
+    {     
+        public class WorkerOptions
+        {
+            public int BufferCapacity { get; set; }
+            public int BufferDelay { get; set; }
+            public int DelayAfterSession { get; set; }
+        }
+        
+        private readonly WorkerOptions _options;
         private readonly ILogger<Worker> _logger;
         private readonly IServiceScopeFactory<IJobBoardClient> _clientsScopeFactory;
         private readonly IServiceScopeFactory<IVacancyRepository> _repositoryScopeFactory;
 
         public Worker(
+            IOptions<WorkerOptions> options,
             ILogger<Worker> logger, 
             IServiceScopeFactory<IJobBoardClient> clientsScopeFactory,
             IServiceScopeFactory<IVacancyRepository> repositoryScopeFactory)
         {
+            _options = options.Value;
             _logger = logger;
             _clientsScopeFactory = clientsScopeFactory;
             _repositoryScopeFactory = repositoryScopeFactory;
@@ -33,6 +43,7 @@ namespace KeySkills.Crawler.App
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Worker {@options}", _options);
 
                 using var clientScope = _clientsScopeFactory.CreateScope();
                 var clients = clientScope.GetServices();
@@ -42,7 +53,10 @@ namespace KeySkills.Crawler.App
 
                 clients.ToObservable()
                     .SelectMany(client => client.GetVacancies())
-                    .Buffer(TimeSpan.FromSeconds(30), 50)
+                    .Buffer(
+                        TimeSpan.FromSeconds(_options.BufferDelay), 
+                        _options.BufferCapacity
+                    )
                     .Subscribe(
                         onNext: async vacancies => {
                             _logger.LogInformation("Saving {count} new vacancies", vacancies.Count());                            
@@ -59,7 +73,10 @@ namespace KeySkills.Crawler.App
                         onCompleted: () => _logger.LogInformation("Session completed")
                     );
                 
-                await Task.Delay(60 * 60 * 1000, stoppingToken);
+                await Task.Delay(
+                    TimeSpan.FromSeconds(_options.DelayAfterSession), 
+                    stoppingToken
+                );
             }
         }
     }
