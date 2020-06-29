@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\KeySkills.Core\KeySkills.Core.csproj" />
+    <ProjectReference Include="..\KeySkills.Core.Data\KeySkills.Core.Data.csproj" />
+    <ProjectReference Include="..\KeySkills.Core.Data.Sqlite\KeySkills.Core.Data.Sqlite.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+
+</Project>

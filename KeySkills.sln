@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeySkills.Core.Data.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeySkills.Core.Data.Sqlite.Tests", "KeySkills.Core.Data.Sqlite.Tests\KeySkills.Core.Data.Sqlite.Tests.csproj", "{584428BF-A7EF-48F3-B55D-B803AA1D8552}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeySkills.WebApi", "KeySkills.WebApi\KeySkills.WebApi.csproj", "{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -170,5 +172,17 @@ Global
 		{584428BF-A7EF-48F3-B55D-B803AA1D8552}.Release|x64.Build.0 = Release|Any CPU
 		{584428BF-A7EF-48F3-B55D-B803AA1D8552}.Release|x86.ActiveCfg = Release|Any CPU
 		{584428BF-A7EF-48F3-B55D-B803AA1D8552}.Release|x86.Build.0 = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|x64.Build.0 = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Debug|x86.Build.0 = Debug|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|x64.ActiveCfg = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|x64.Build.0 = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|x86.ActiveCfg = Release|Any CPU
+		{67A21D88-F29E-42BA-B1F5-9E6A076EB76A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
